@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table Hunter — PoC B2C dla stołów z żywicy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f1ea; --paper:#fffdf9; --ink:#1b1e21; --muted:#6a6e72; --line:#e4ddd1;
+  --resin:#1e5c86; --resin-2:#2f8bbd; --resin-soft:#e3eff6;
+  --green:#1f4a3a; --green-soft:#e3eee8;
+  --amber:#c98a12; --amber-soft:#fbf0d9;
+  --wood:#8a5a35; --danger:#a9412c; --danger-soft:#f7e4df;
+  --r:14px; --shadow:0 1px 2px rgba(30,25,15,.06),0 6px 20px rgba(30,25,15,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:650;letter-spacing:-.01em;margin:0}
+h1{font-size:26px} h2{font-size:21px} h3{font-size:16px}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit}
+.muted{color:var(--muted)} .small{font-size:13px} .tiny{font-size:12px}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+aside{background:var(--ink);color:#efe9df;padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;gap:10px;align-items:center;padding:0 8px}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--wood) 0 38%,var(--resin-2) 38% 62%,var(--wood) 62%);flex:none}
+.brand b{font-family:Fraunces,serif;font-size:18px;display:block;line-height:1.1}
+.brand span{font-size:12px;color:#b9b2a6}
+nav{display:flex;flex-direction:column;gap:2px}
+nav a{color:#d9d2c6;text-decoration:none;padding:9px 12px;border-radius:9px;display:flex;gap:10px;align-items:center;font-weight:500}
+nav a:hover{background:#2a2e32}
+nav a.on{background:#f5f1ea;color:var(--ink)}
+nav a i{font-style:normal;width:18px;text-align:center;opacity:.85}
+.side-note{margin-top:auto;font-size:12px;color:#a59e92;padding:0 8px;line-height:1.45}
+main{padding:26px 30px 60px;max-width:1180px;width:100%;min-width:0}
+#ads,.ad{min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--amber-soft);color:#7a5308}
+.pill.blue{background:var(--resin-soft);color:var(--resin)}
+.pill.green{background:var(--green-soft);color:var(--green)}
+.pill.red{background:var(--danger-soft);color:var(--danger)}
+.pill.grey{background:#ece7de;color:#555}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.kpi .v{font-family:Fraunces,serif;font-size:30px;font-weight:650;line-height:1.1;margin-top:6px}
+.kpi .l{font-size:13px;color:var(--muted)}
+.kpi .d{font-size:12px;margin-top:4px;color:var(--green);font-weight:600}
+.section-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+.flow{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.flow .step{flex:1 1 150px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;position:relative}
+.flow .step b{display:block;font-size:14px;margin-bottom:4px}
+.flow .step .n{font-family:Fraunces,serif;color:var(--resin);font-size:13px;font-weight:650}
+.flow .arrow{align-self:center;color:var(--muted);font-size:18px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 10px;border-bottom:1px solid #efe9df;vertical-align:middle}
+tr.click{cursor:pointer} tr.click:hover td{background:#faf6ef}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.score{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:28px;border-radius:8px;font-weight:700;font-size:14px}
+.s-hot{background:var(--green);color:#fff} .s-warm{background:var(--amber-soft);color:#7a5308} .s-cold{background:#ece7de;color:#555}
+.bar{height:8px;background:#ece6dc;border-radius:99px;overflow:hidden}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--resin),var(--resin-2));border-radius:99px}
+.btn{border:1px solid var(--line);background:var(--paper);padding:8px 14px;border-radius:10px;font-weight:600;font-size:14px;color:var(--ink)}
+.btn:hover{border-color:#cfc6b7}
+.btn.primary{background:var(--resin);color:#fff;border-color:var(--resin)}
+.btn.primary:hover{background:#174b6e}
+.btn.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.sm{padding:5px 10px;font-size:13px;border-radius:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:500;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+label.f{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
+input[type=text],input[type=email],input[type=number],select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--resin)}
+.row{display:flex;gap:12px;align-items:center}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.stack>*+*{margin-top:10px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw.on{box-shadow:0 0 0 2px var(--ink)}
+.preview{background:linear-gradient(180deg,#efe8dc,#e6ddce);border-radius:12px;padding:18px;display:flex;justify-content:center;align-items:center;min-height:220px}
+.price{font-family:Fraunces,serif;font-size:28px;font-weight:650}
+.consent{background:#faf6ef;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px}
+.consent label{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:#ede7dd;border-radius:12px;padding:10px;min-height:120px}
+.col h3{font-size:14px;font-family:Inter,sans-serif;font-weight:600;margin:2px 4px 10px;display:flex;justify-content:space-between}
+.pcard{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;font-size:13px}
+.pcard b{font-size:14px}
+.src-card h3{margin-bottom:6px}
+.src-card ul{margin:8px 0 0;padding-left:18px;font-size:13px}
+.src-card li{margin:3px 0}
+.dont{border-left:4px solid var(--danger)}
+.ad{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.ad .hd{display:flex;gap:10px;align-items:center;padding:12px}
+.ad .av{width:38px;height:38px;border-radius:8px;background:var(--ink);flex:none}
+.ad .tx{padding:0 12px 10px;font-size:14px;white-space:pre-line}
+.ad .img{height:150px;position:relative}
+.ad .cta{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f3f0ea;font-size:13px}
+.ad .cta b{max-width:70%}
+.drawer-bg{position:fixed;inset:0;background:rgba(20,18,14,.38);display:none;z-index:40}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(520px,100%);background:var(--paper);z-index:41;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:22px;visibility:hidden}
+.drawer.open{transform:none;visibility:visible;box-shadow:-10px 0 30px rgba(0,0,0,.12)}
+.drawer-bg.open{display:block}
+.reason{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line)}
+textarea{width:100%;min-height:190px;border:1px solid var(--line);border-radius:10px;padding:12px;font:14px/1.5 Inter,sans-serif;background:#fff;resize:vertical}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;opacity:0;transition:all .25s;z-index:60;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.view{display:none} .view.on{display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.weights .wl{display:flex;justify-content:space-between;font-size:13px;margin-top:10px}
+.callout{background:var(--resin-soft);border-radius:12px;padding:14px 16px;font-size:14px;color:#123a55}
+.callout.warn{background:var(--amber-soft);color:#5d3f05}
+.out .v{font-family:Fraunces,serif;font-size:22px;font-weight:650}
+.out .l{font-size:12px;color:var(--muted)}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .top>div{min-width:0}
+  aside{position:sticky;top:0;height:auto;padding:10px 10px 8px;z-index:30;gap:8px}
+  .brand{padding:0 4px} .side-note{display:none}
+  nav{flex-direction:row;overflow-x:auto;gap:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav a{white-space:nowrap;padding:7px 11px;font-size:14px}
+  main{padding:18px 14px 50px}
+  .g4{grid-template-columns:repeat(2,1fr)} .g3,.g2{grid-template-columns:1fr}
+  h1{font-size:22px}
+  .kpi .v{font-size:24px}
+  .flow .arrow{display:none}
+  .hide-m{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><div class="logo"></div><div><b>Table Hunter</b><span>PoC · B2C · stoły z żywicy</span></div></div>
+    <nav id="nav">
+      <a href="#pulpit" data-v="pulpit"><i>◎</i>Pulpit</a>
+      <a href="#radar" data-v="radar"><i>⌖</i>Radar popytu</a>
+      <a href="#leady" data-v="leady"><i>✦</i>Leady</a>
+      <a href="#partnerzy" data-v="partnerzy"><i>⬡</i>Architekci</a>
+      <a href="#kampania" data-v="kampania"><i>in</i>Kampania LinkedIn</a>
+      <a href="#konfigurator" data-v="konfigurator"><i>▭</i>Konfigurator</a>
+      <a href="#zrodla" data-v="zrodla"><i>≡</i>Źródła danych</a>
+    </nav>
+    <div class="side-note">Prototyp do prezentacji idei. Wszystkie osoby, firmy i liczby są przykładowe — w MVP zastąpią je dane z podłączonych źródeł.</div>
+  </aside>
+
+  <main>
+  <!-- PULPIT -->
+  <section class="view" id="v-pulpit">
+    <div class="top">
+      <div><span class="pill">Proof of concept · dane przykładowe</span><h1 style="margin-top:8px">Klient na stół za 12 000 zł nie leży w żadnej bazie.</h1>
+      <p class="muted" style="margin:6px 0 0;max-width:720px">Dlatego aplikacja nie „kupuje kontaktów”, tylko łączy trzy rzeczy: sygnały popytu (gdzie i kiedy ludzie urządzają drogie wnętrza), przechwytywanie leadów ze zgodą i kanał architektów wnętrz, którzy realnie decydują o meblach.</p></div>
+    </div>
+    <div class="grid g4" id="kpis"></div>
+
+    <div class="section-h"><h2>Jak to działa</h2><span class="muted small">5 kroków, każdy to moduł aplikacji</span></div>
+    <div class="flow">
+      <div class="step"><span class="n">01</span><b>Sygnały popytu</b><span class="small muted">Rejestry budów, GUS, trendy wyszukiwań, nowe inwestycje premium → gdzie celować</span></div><div class="arrow">→</div>
+      <div class="step"><span class="n">02</span><b>Zasięg</b><span class="small muted">LinkedIn, Meta, Google, architekci — reklamy na geo-segmenty i persony</span></div><div class="arrow">→</div>
+      <div class="step"><span class="n">03</span><b>Przechwycenie ze zgodą</b><span class="small muted">Konfigurator, Lead Gen Form, showroom — osobna zgoda na każdy kanał</span></div><div class="arrow">→</div>
+      <div class="step"><span class="n">04</span><b>AI scoring + szkic odpowiedzi</b><span class="small muted">Budżet, termin, źródło, dopasowanie → kto pierwszy, co napisać</span></div><div class="arrow">→</div>
+      <div class="step"><span class="n">05</span><b>Domknięcie</b><span class="small muted">Handlowiec / architekt, próbka żywicy, wizualizacja, CRM</span></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card">
+        <div class="row between"><h3>Leady według źródła</h3><span class="tiny muted">ostatnie 30 dni</span></div>
+        <div id="bySource" class="stack" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="row between"><h3>Najgorętsze teraz</h3><a href="#leady" class="small" style="color:var(--resin);font-weight:600">wszystkie →</a></div>
+        <div id="hotList" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RADAR -->
+  <section class="view" id="v-radar">
+    <div class="top"><div><h1>Radar popytu</h1><p class="muted" style="margin:6px 0 0;max-width:700px">Gdzie w najbliższych 6–18 miesiącach ludzie będą urządzać drogie jadalnie. Dane zagregowane (gmina/powiat), bez danych osobowych — służą do geotargetowania reklam i wyboru miast dla showroomu i partnerów.</p></div></div>
+    <div class="grid" style="grid-template-columns:minmax(0,1fr) 300px;align-items:start" id="radarGrid">
+      <div class="card" style="padding:8px 8px 4px">
+        <div class="tablewrap"><table id="radarTable"></table></div>
+      </div>
+      <div class="card weights">
+        <h3>Wagi wskaźników</h3>
+        <p class="tiny muted" style="margin:4px 0 0">Przesuń — ranking przelicza się na żywo.</p>
+        <div id="weights"></div>
+        <div class="callout" style="margin-top:16px;font-size:13px">W MVP: RWDZ (GUNB), GUS BDL API, Google Trends, Google Places — odświeżane co tydzień.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEADY -->
+  <section class="view" id="v-leady">
+    <div class="top"><div><h1>Leady</h1><p class="muted" style="margin:6px 0 0">Tylko osoby, które same zostawiły zapytanie lub zgodę. Kliknij wiersz: zobaczysz, skąd wynik i szkic odpowiedzi.</p></div>
+      <button class="btn primary" onclick="go('konfigurator')">+ Lead z konfiguratora</button></div>
+    <div class="chips" id="srcFilter" style="margin-bottom:12px"></div>
+    <div class="card" style="padding:6px">
+      <div class="tablewrap"><table id="leadTable"></table></div>
+    </div>
+  </section>
+
+  <!-- PARTNERZY -->
+  <section class="view" id="v-partnerzy">
+    <div class="top"><div><h1>Architekci i projektanci wnętrz</h1><p class="muted" style="margin:6px 0 0;max-width:720px">Kanał B2B2C: jedno dobre studio to kilka–kilkanaście stołów rocznie. Pracownie znajdujemy w publicznych katalogach i portfolio, kontakt nawiązujemy na LinkedIn, a potem prowadzimy program partnerski.</p></div></div>
+    <div class="kanban" id="kanban"></div>
+    <div class="grid g3" style="margin-top:18px">
+      <div class="card"><h3>Program partnerski (propozycja)</h3><ul class="small" style="padding-left:18px;margin:8px 0 0"><li>Prowizja lub rabat dla pracowni od każdego stołu</li><li>Zestaw próbek żywicy i drewna do pracowni</li><li>Wizualizacja stołu do projektu klienta w 48 h</li><li>Pliki 3D / BIM do programów projektowych</li></ul></div>
+      <div class="card"><h3>Sygnały dopasowania</h3><ul class="small" style="padding-left:18px;margin:8px 0 0"><li>Realizacje domów i apartamentów premium</li><li>Drewno, naturalne materiały, meble na zamówienie</li><li>Aktywność na LinkedIn / Instagram w ostatnich 90 dniach</li><li>Region z wysokim indeksem w radarze</li></ul></div>
+      <div class="card"><h3>Skąd lista pracowni</h3><ul class="small" style="padding-left:18px;margin:8px 0 0"><li>Stowarzyszenie Architektów Wnętrz, Izba Architektów RP</li><li>Homebook, Houzz, portfolio w mediach branżowych</li><li>Google Places API (studia w danym mieście)</li><li>Targi: Warsaw Home &amp; Contract, 4 Design Days</li></ul></div>
+    </div>
+  </section>
+
+  <!-- KAMPANIA -->
+  <section class="view" id="v-kampania">
+    <div class="top"><div><h1>Kampania LinkedIn</h1><p class="muted" style="margin:6px 0 0;max-width:720px">Trzy grupy odbiorców, jeden cel: zapytanie o stół lub rozmowa z pracownią. Kalkulator pokazuje, co daje budżet przy zadanych założeniach — wszystkie założenia możesz zmienić.</p></div></div>
+    <div class="grid" style="grid-template-columns:minmax(0,1fr) 340px;align-items:start" id="campGrid">
+      <div>
+        <div class="chips" id="audChips" style="margin-bottom:12px"></div>
+        <div class="grid g3" id="ads"></div>
+      </div>
+      <div class="card">
+        <h3>Kalkulator budżetu</h3>
+        <label class="f">Budżet miesięczny: <span id="bVal"></span></label>
+        <input type="range" id="budget" min="2000" max="30000" step="500" value="8000">
+        <div class="grid g2" style="gap:8px">
+          <div><label class="f">CPM (zł)</label><input type="number" id="cpm" value="70" min="10"></div>
+          <div><label class="f">CTR (%)</label><input type="number" id="ctr" value="0.6" step="0.1" min="0.1"></div>
+          <div><label class="f">Konwersja formularza (%)</label><input type="number" id="cvr" value="9" step="0.5" min="0.5"></div>
+          <div><label class="f">Lead → konsultacja (%)</label><input type="number" id="l2m" value="30" step="1" min="1"></div>
+          <div><label class="f">Konsultacja → zakup (%)</label><input type="number" id="m2s" value="20" step="1" min="1"></div>
+          <div><label class="f">Śr. wartość (zł)</label><input type="number" id="aov" value="12000" step="500" min="1000"></div>
+        </div>
+        <div class="grid g2 out" style="gap:12px;margin-top:16px" id="calcOut"></div>
+        <p class="tiny muted" style="margin:12px 0 0">Założenia startowe są ostrożne i do weryfikacji po 2–3 tygodniach testu. Cykl zakupu drogiego stołu bywa długi, więc część sprzedaży przyjdzie z opóźnieniem.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONFIGURATOR -->
+  <section class="view" id="v-konfigurator">
+    <div class="top"><div><span class="pill blue">Widok klienta</span><h1 style="margin-top:8px">Konfigurator = magnes na leady</h1><p class="muted" style="margin:6px 0 0;max-width:700px">Klient sam podaje wymiary, materiał i budżet — to najlepszy możliwy lead. Wysłanie tworzy rekord w zakładce „Leady” z gotowym wynikiem.</p></div></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="card">
+        <div class="preview"><svg id="tableSvg" viewBox="0 0 320 170" width="100%" style="max-width:420px"></svg></div>
+        <div class="row between" style="margin-top:14px;align-items:flex-end">
+          <div><div class="tiny muted">Szacunkowa cena</div><div class="price" id="price"></div></div>
+          <div class="tiny muted" style="text-align:right" id="specLine"></div>
+        </div>
+        <label class="f">Długość: <span id="lenV"></span> cm</label><input type="range" id="len" min="140" max="320" step="10" value="220">
+        <label class="f">Szerokość: <span id="widV"></span> cm</label><input type="range" id="wid" min="70" max="120" step="5" value="95">
+        <label class="f">Drewno</label><div class="chips" id="woodChips"></div>
+        <label class="f">Styl żywicy</label><div class="chips" id="styleChips"></div>
+        <label class="f">Kolor żywicy</label><div class="swatches" id="resinSw"></div>
+        <label class="f">Nogi — aluminium (linia elementów aluminiowych)</label><div class="chips" id="legChips"></div>
+      </div>
+      <form class="card" id="cfgForm">
+        <h3>Wyślij zapytanie</h3>
+        <label class="f">Imię</label><input type="text" id="fName" placeholder="np. Anna" required>
+        <label class="f">Miasto</label><input type="text" id="fCity" placeholder="np. Konstancin-Jeziorna" required>
+        <label class="f">E-mail</label><input type="email" id="fMail" placeholder="anna@example.com" required>
+        <div class="grid g2" style="gap:10px">
+          <div><label class="f">Na kiedy?</label><select id="fTime"><option>do 1 mies.</option><option selected>1–3 mies.</option><option>3–6 mies.</option><option>6+ mies. / nie wiem</option></select></div>
+          <div><label class="f">Do jakiego wnętrza?</label><select id="fSeg"><option>Nowy dom</option><option>Apartament premium</option><option>Zmiana jadalni</option><option>Biuro / sala konferencyjna</option></select></div>
+        </div>
+        <label class="f">Pracuje z Tobą architekt?</label><select id="fArch"><option value="0">Nie</option><option value="1">Tak</option></select>
+        <div class="consent" style="margin-top:14px">
+          <div class="tiny muted">Każdy kanał osobno, nic nie jest zaznaczone domyślnie.</div>
+          <label><input type="checkbox" id="cMail"> Chcę dostawać e-mailem inspiracje i oferty dotyczące stołów.</label>
+          <label><input type="checkbox" id="cPhone"> Zgadzam się na kontakt telefoniczny w sprawie oferty.</label>
+          <div class="tiny muted" style="margin-top:6px">Na samo zapytanie odpowiemy niezależnie od zgód. Administrator danych, cel, prawo do wycofania zgody — link do polityki prywatności.</div>
+        </div>
+        <button class="btn primary" style="width:100%;margin-top:14px;padding:11px">Wyślij i zobacz lead w systemie →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ZRODLA -->
+  <section class="view" id="v-zrodla">
+    <div class="top"><div><h1>Źródła danych</h1><p class="muted" style="margin:6px 0 0;max-width:720px">Co zasila aplikację w MVP. Pełny opis z oceną prawną i kosztami jest w dokumencie „zrodla-danych.md”.</p></div></div>
+    <div class="legend" style="margin-bottom:14px"><span><span class="dot" style="background:var(--green)"></span>API / automatycznie</span><span><span class="dot" style="background:var(--resin-2)"></span>Eksport / integracja CRM</span><span><span class="dot" style="background:var(--amber)"></span>Ręcznie / półautomatycznie</span></div>
+    <div class="grid g3" id="srcCards"></div>
+    <div class="card dont" style="margin-top:18px">
+      <h3>Czego aplikacja świadomie nie robi</h3>
+      <ul class="small" style="padding-left:18px;margin:8px 0 0">
+        <li>Nie scrapuje LinkedIn ani nie używa botów do automatycznych zaproszeń i wiadomości — łamie to regulamin i kończy się blokadą konta.</li>
+        <li>Nie kupuje „baz zamożnych osób” i nie wysyła ofert do ludzi, którzy nie wyrazili zgody — od listopada 2024 r. wymaga jej art. 398 Prawa komunikacji elektronicznej, także w relacjach B2B.</li>
+        <li>Nie wyciąga danych osobowych inwestorów z rejestrów budowlanych — korzysta z nich tylko w agregacie (ile domów, gdzie).</li>
+      </ul>
+    </div>
+  </section>
+  </main>
+</div>
+
+<div class="drawer-bg" id="dbg" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- dane przykładowe ---------- */
+const SRC = {
+  cfg:{label:'Konfigurator na stronie',q:1.0,color:'#1f4a3a'},
+  arch:{label:'Polecenie architekta',q:1.0,color:'#8a5a35'},
+  lgf:{label:'LinkedIn Lead Gen Form',q:0.8,color:'#1e5c86'},
+  show:{label:'Showroom / targi',q:0.9,color:'#c98a12'},
+  meta:{label:'Instagram / Meta Lead Ads',q:0.6,color:'#2f8bbd'},
+  news:{label:'Newsletter (zgoda)',q:0.5,color:'#9a9184'}
+};
+const SEG_FIT = {'Nowy dom':12,'Apartament premium':12,'Zmiana jadalni':8,'Biuro / sala konferencyjna':10,'Projekt architekta':15};
+const TIME_PTS = {'do 1 mies.':22,'1–3 mies.':18,'3–6 mies.':10,'6+ mies. / nie wiem':4};
+
+let leads = [
+ {id:1,name:'Anna K.',city:'Konstancin-Jeziorna',src:'cfg',seg:'Nowy dom',budget:14500,time:'1–3 mies.',spec:'Orzech · rzeka · 240×100 · granat',arch:true,cMail:true,cPhone:true,ago:'2 h temu'},
+ {id:2,name:'Pracownia Linea (dla klienta)',city:'Kraków',src:'arch',seg:'Projekt architekta',budget:18000,time:'do 1 mies.',spec:'Dąb · ocean · 280×105 · szmaragd',arch:true,cMail:true,cPhone:true,ago:'5 h temu'},
+ {id:3,name:'Tomasz R.',city:'Wrocław',src:'lgf',seg:'Apartament premium',budget:11000,time:'1–3 mies.',spec:'Dąb · rzeka · 200×90',arch:false,cMail:true,cPhone:false,ago:'wczoraj'},
+ {id:4,name:'Marta i Piotr S.',city:'Suchy Las',src:'show',seg:'Nowy dom',budget:16000,time:'3–6 mies.',spec:'Wiąz · rzeka · 260×100 · bursztyn',arch:false,cMail:true,cPhone:true,ago:'wczoraj'},
+ {id:5,name:'Krzysztof W.',city:'Gdynia',src:'lgf',seg:'Biuro / sala konferencyjna',budget:22000,time:'3–6 mies.',spec:'Orzech · ocean · 320×120',arch:false,cMail:true,cPhone:true,ago:'2 dni temu'},
+ {id:6,name:'Ewelina D.',city:'Piaseczno',src:'meta',seg:'Zmiana jadalni',budget:7000,time:'6+ mies. / nie wiem',spec:'Akacja · rzeka · 180×85',arch:false,cMail:true,cPhone:false,ago:'3 dni temu'},
+ {id:7,name:'Michał P.',city:'Gliwice',src:'cfg',seg:'Apartament premium',budget:9500,time:'do 1 mies.',spec:'Dąb · lity z wtrąceniami · 200×95 · dymny czarny',arch:false,cMail:false,cPhone:false,ago:'3 dni temu'},
+ {id:8,name:'Joanna L.',city:'Lublin',src:'news',seg:'Zmiana jadalni',budget:6000,time:'6+ mies. / nie wiem',spec:'—',arch:false,cMail:true,cPhone:false,ago:'5 dni temu'},
+ {id:9,name:'Studio Forma 8 (dla klienta)',city:'Warszawa',src:'arch',seg:'Projekt architekta',budget:15500,time:'1–3 mies.',spec:'Orzech · rzeka · 250×100 · granat',arch:true,cMail:true,cPhone:true,ago:'6 dni temu'}
+];
+
+const REGIONS = [
+ {n:'Piaseczno / Konstancin',w:'mazowieckie',permits:1480,compl:5200,inc:142,studios:64,trend:88},
+ {n:'Warszawa',w:'mazowieckie',permits:620,compl:21800,inc:150,studios:410,trend:100},
+ {n:'Wieliczka / Zabierzów',w:'małopolskie',permits:1210,compl:3900,inc:118,studios:38,trend:71},
+ {n:'Kobierzyce / Długołęka',w:'dolnośląskie',permits:1350,compl:6100,inc:124,studios:29,trend:69},
+ {n:'Suchy Las / Komorniki',w:'wielkopolskie',permits:990,compl:4300,inc:121,studios:33,trend:63},
+ {n:'Gdańsk / Gdynia / Sopot',w:'pomorskie',permits:760,compl:11800,inc:128,studios:155,trend:77},
+ {n:'Katowice / Gliwice / Tychy',w:'śląskie',permits:830,compl:6900,inc:116,studios:120,trend:58},
+ {n:'Łódź i okolice',w:'łódzkie',permits:540,compl:6200,inc:104,studios:70,trend:47},
+ {n:'Lublin i okolice',w:'lubelskie',permits:610,compl:4700,inc:98,studios:52,trend:44}
+];
+const IND = [
+ {k:'permits',l:'Domy jednorodzinne — pozwolenia i zgłoszenia, 12 mies. (RWDZ)',w:35},
+ {k:'compl',l:'Mieszkania oddane do użytku (GUS BDL)',w:15},
+ {k:'inc',l:'Dochód na mieszkańca, indeks PL=100 (GUS)',w:25},
+ {k:'studios',l:'Studia projektowania wnętrz (Google Places)',w:10},
+ {k:'trend',l:'Wyszukiwania „stół z żywicy” (Google Trends)',w:15}
+];
+
+let partners = [
+ {n:'Pracownia Linea',c:'Kraków',fit:92,st:4,sig:'domy premium · drewno'},
+ {n:'Studio Forma 8',c:'Warszawa',fit:89,st:4,sig:'apartamenty · meble na zamówienie'},
+ {n:'Nord Wnętrza',c:'Gdańsk',fit:84,st:2,sig:'skandynawski · dąb'},
+ {n:'Atelier Kamień i Drewno',c:'Konstancin',fit:88,st:3,sig:'rezydencje · naturalne materiały'},
+ {n:'Projekt Oś',c:'Wrocław',fit:77,st:1,sig:'domy jednorodzinne'},
+ {n:'Biuro Wnętrz Sieć',c:'Poznań',fit:71,st:0,sig:'biura · sale konferencyjne'},
+ {n:'Studio Mira',c:'Katowice',fit:80,st:1,sig:'loft · industrial'},
+ {n:'Kreska i Faktura',c:'Lublin',fit:68,st:0,sig:'mieszkania · aktywni na IG'},
+ {n:'Hale Design',c:'Gliwice',fit:74,st:2,sig:'domy · stal i drewno'}
+];
+const STAGES = ['Zidentyfikowane','Kontakt na LinkedIn','Rozmowa','Próbki / showroom','Partner aktywny'];
+
+const AUD = [
+ {k:'arch',l:'A · Architekci wnętrz',share:45,
+  tgt:'Stanowiska: architekt wnętrz, projektant wnętrz, interior designer · branża: architektura i planowanie, projektowanie · PL, top 8 aglomeracji',
+  head:'Stół, który domyka projekt — wizualizacja do Twojego projektu w 48 h',
+  body:'Projektujesz jadalnie, w których stół ma być punktem centralnym?\n\nDajemy pracowniom próbki żywicy i drewna, pliki 3D oraz wizualizację stołu w projekcie klienta w 48 h. Do tego program partnerski.',
+  cta:'Zamów zestaw próbek dla pracowni',grad:'linear-gradient(120deg,#6b4428 0 40%,#1e5c86 40% 58%,#6b4428 58%)'},
+ {k:'dev',l:'B · Deweloperzy i sprzedaż premium',share:20,
+  tgt:'Firmy: deweloperzy mieszkaniowi (lista firm — Company List) · stanowiska: marketing, sprzedaż, wykończenia pod klucz',
+  head:'Apartament pokazowy, który sprzedaje: stół z żywicy na wyłączność inwestycji',
+  body:'Wyposażamy apartamenty pokazowe i pakiety wykończeń premium. Jeden stół w kolorze inwestycji, ten sam dla kupujących — z rabatem dla Twoich klientów.',
+  cta:'Porozmawiajmy o inwestycji',grad:'linear-gradient(120deg,#3b2a1c 0 30%,#1f4a3a 30% 70%,#3b2a1c 70%)'},
+ {k:'hnw',l:'C · Właściciele firm i kadra C-level',share:35,
+  tgt:'Stanowiska: właściciel, prezes, partner, dyrektor · firmy 11+ osób · geo: segmenty z radaru popytu · retargeting odwiedzających stronę',
+  head:'Jeden stół. Jeden kawałek drewna. Jedna rzeka, której nikt inny nie ma.',
+  body:'Robimy stoły z litego drewna i żywicy na wymiar — od pierwszego szkicu do montażu w Twoim domu. Skonfiguruj swój w 2 minuty i zobacz cenę od razu.',
+  cta:'Skonfiguruj swój stół',grad:'linear-gradient(120deg,#7a4e2c 0 44%,#c98a12 44% 56%,#7a4e2c 56%)'}
+];
+let audOn = new Set(['arch','dev','hnw']);
+
+/* ---------- pomocnicze ---------- */
+const $ = s => document.querySelector(s);
+const zl = n => Math.round(n).toLocaleString('pl-PL').replace(/,/g,' ') + ' zł';
+const num = n => Math.round(n).toLocaleString('pl-PL');
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600)}
+
+function scoreLead(l){
+  const r=[];
+  const b = l.budget>=15000?28: l.budget>=10000?22: l.budget>=6000?15:5;
+  r.push(['Budżet '+zl(l.budget),b,28]);
+  const t = TIME_PTS[l.time]??6; r.push(['Termin: '+l.time,t,22]);
+  const s = Math.round(SRC[l.src].q*20); r.push(['Źródło: '+SRC[l.src].label,s,20]);
+  const c = (l.spec&&l.spec!=='—'?6:0)+(l.arch?4:0); r.push(['Kompletność (specyfikacja, architekt)',c,10]);
+  const f = SEG_FIT[l.seg]??8; r.push(['Dopasowanie segmentu: '+l.seg,f,15]);
+  const k = (l.cMail||l.cPhone)?5:0; r.push(['Zgoda na dalszy kontakt',k,5]);
+  const total = r.reduce((a,x)=>a+x[1],0);
+  return {total,r};
+}
+const cls = s => s>=80?'s-hot':s>=60?'s-warm':'s-cold';
+const label = s => s>=80?'gorący':s>=60?'ciepły':'do pielęgnacji';
+
+/* ---------- routing ---------- */
+const VIEWS=['pulpit','radar','leady','partnerzy','kampania','konfigurator','zrodla'];
+function go(v){location.hash=v}
+function route(){
+  const v = VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'pulpit';
+  VIEWS.forEach(x=>$('#v-'+x).classList.toggle('on',x===v));
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  window.scrollTo(0,0);
+  if(v==='pulpit')renderDash();
+}
+window.addEventListener('hashchange',route);
+
+/* ---------- pulpit ---------- */
+function renderDash(){
+  const sc = leads.map(l=>scoreLead(l).total);
+  const hot = sc.filter(s=>s>=80).length;
+  const pipe = leads.reduce((a,l)=>a+l.budget,0);
+  const act = partners.filter(p=>p.st===4).length;
+  $('#kpis').innerHTML = [
+    ['Leady (30 dni)',leads.length,'+38% m/m'],
+    ['Gorące (≥80 pkt)',hot,'odpowiedź w 1 h'],
+    ['Wartość zapytań',zl(pipe),'śr. '+zl(pipe/leads.length)],
+    ['Aktywni partnerzy',act+' / '+partners.length,'pracownie w lejku']
+  ].map(k=>`<div class="card kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="d">${k[2]}</div></div>`).join('');
+  const cnt={}; leads.forEach(l=>cnt[l.src]=(cnt[l.src]||0)+1);
+  const max=Math.max(...Object.values(cnt));
+  $('#bySource').innerHTML = Object.keys(SRC).filter(k=>cnt[k]).sort((a,b)=>cnt[b]-cnt[a]).map(k=>`
+    <div><div class="row between small"><span>${SRC[k].label}</span><b>${cnt[k]}</b></div>
+    <div class="bar" style="margin-top:4px"><span style="width:${cnt[k]/max*100}%;background:${SRC[k].color}"></span></div></div>`).join('');
+  const top = leads.map(l=>({l,s:scoreLead(l).total})).sort((a,b)=>b.s-a.s).slice(0,4);
+  $('#hotList').innerHTML = top.map(({l,s})=>`
+    <div class="row between" style="padding:9px 0;border-bottom:1px solid #efe9df;cursor:pointer" onclick="openLead(${l.id})">
+      <div><b>${l.name}</b><div class="tiny muted">${l.city} · ${SRC[l.src].label}</div></div>
+      <span class="score ${cls(s)}">${s}</span></div>`).join('');
+}
+
+/* ---------- radar ---------- */
+function renderWeights(){
+  $('#weights').innerHTML = IND.map((i,ix)=>`
+    <div class="wl"><span>${i.l}</span><b id="wv${ix}">${i.w}</b></div>
+    <input type="range" min="0" max="50" value="${i.w}" oninput="IND[${ix}].w=+this.value;$('#wv${ix}').textContent=this.value;renderRadar()">`).join('');
+}
+function renderRadar(){
+  const mx={}; IND.forEach(i=>mx[i.k]=Math.max(...REGIONS.map(r=>r[i.k])));
+  const tw = IND.reduce((a,i)=>a+i.w,0)||1;
+  const rows = REGIONS.map(r=>({r,idx:Math.round(IND.reduce((a,i)=>a+i.w*(r[i.k]/mx[i.k]),0)/tw*100)})).sort((a,b)=>b.idx-a.idx);
+  $('#radarTable').innerHTML = `<tr><th>#</th><th>Obszar</th><th>Indeks</th><th class="hide-m">Domy 12m</th><th class="hide-m">Dochód</th><th class="hide-m">Studia</th><th>Akcja</th></tr>` +
+   rows.map((x,i)=>`<tr><td class="muted">${i+1}</td><td><b>${x.r.n}</b><div class="tiny muted">${x.r.w}</div></td>
+    <td style="min-width:110px"><div class="row" style="gap:8px"><b style="width:26px">${x.idx}</b><div class="bar" style="flex:1"><span style="width:${x.idx}%"></span></div></div></td>
+    <td class="hide-m">${num(x.r.permits)}</td><td class="hide-m">${x.r.inc}</td><td class="hide-m">${x.r.studios}</td>
+    <td>${x.idx>=70?`<button class="btn sm primary" onclick="toast('Geo-segment „${x.r.n}” dodany do kampanii C')">Do kampanii</button>`:x.idx>=50?'<span class="pill blue">obserwuj</span>':'<span class="pill grey">później</span>'}</td></tr>`).join('');
+}
+
+/* ---------- leady ---------- */
+let srcF='all';
+function renderFilter(){
+  const opts=[['all','Wszystkie'],...Object.entries(SRC).map(([k,v])=>[k,v.label])];
+  $('#srcFilter').innerHTML = opts.map(([k,l])=>`<button class="chip ${srcF===k?'on':''}" onclick="srcF='${k}';renderFilter();renderLeads()">${l}</button>`).join('');
+}
+function consentPills(l){
+  return `${l.cMail?'<span class="pill green">e-mail ✓</span>':'<span class="pill grey">e-mail ✗</span>'} ${l.cPhone?'<span class="pill green">tel ✓</span>':'<span class="pill grey">tel ✗</span>'}`;
+}
+function renderLeads(){
+  const list = leads.filter(l=>srcF==='all'||l.src===srcF).map(l=>({l,s:scoreLead(l).total})).sort((a,b)=>b.s-a.s);
+  $('#leadTable').innerHTML = `<tr><th>Wynik</th><th>Kto</th><th class="hide-m">Segment</th><th>Budżet</th><th class="hide-m">Termin</th><th class="hide-m">Zgody</th></tr>` +
+   (list.length?list.map(({l,s})=>`<tr class="click" onclick="openLead(${l.id})"><td><span class="score ${cls(s)}">${s}</span></td>
+     <td><b>${l.name}</b><div class="tiny muted">${l.city} · ${SRC[l.src].label} · ${l.ago}</div></td>
+     <td class="hide-m small">${l.seg}</td><td>${zl(l.budget)}</td><td class="hide-m small">${l.time}</td><td class="hide-m">${consentPills(l)}</td></tr>`).join('')
+    :`<tr><td colspan="6" class="muted" style="padding:20px">Brak leadów z tego źródła.</td></tr>`);
+}
+function draft(l){
+  const first = l.name.split(' ')[0];
+  const intro = l.src==='arch'
+   ? `Dzień dobry,\n\ndziękujemy za przesłanie projektu. Przygotujemy wizualizację stołu (${l.spec}) w Państwa aranżacji w ciągu 48 h.`
+   : `Dzień dobry ${first},\n\ndziękujemy za zapytanie o stół (${l.spec}).`;
+  const seg = {'Nowy dom':'Przy nowym domu warto dobrać kolor żywicy do podłogi i frontów kuchni, dlatego chętnie wyślemy próbki materiałów.',
+   'Apartament premium':'W apartamencie stół bywa centrum otwartej przestrzeni, więc proponujemy krótką rozmowę o świetle i proporcjach.',
+   'Zmiana jadalni':'Jeśli zmieniasz jadalnię etapami, możemy zacząć od wyceny i próbek bez zobowiązań.',
+   'Biuro / sala konferencyjna':'Do sali konferencyjnej przygotujemy wariant z przepustami na kable i nogami z aluminium dopasowanymi do wysokości krzeseł.',
+   'Projekt architekta':'Prześlemy też pliki 3D do Państwa programu i warunki programu partnerskiego.'}[l.seg]||'';
+  const time = l.time==='do 1 mies.'?'Ponieważ zależy Ci na czasie, możemy zarezerwować slot produkcyjny już w tym tygodniu.'
+    : 'Realizacja trwa zwykle 4–6 tygodni od akceptacji projektu.';
+  const ask = l.cPhone? 'Czy pasuje Ci krótka rozmowa telefoniczna jutro lub w piątek?' : 'Czy mogę przesłać propozycję 2–3 wariantów z cenami w odpowiedzi na tego maila?';
+  const bud = l.src==='arch' ? `Wstępna wycena tego wariantu: ok. ${zl(l.budget)}.` : `Podany budżet, ok. ${zl(l.budget)}, pozwala na ten wariant.`;
+  return `${intro}\n\n${seg} ${time}\n\n${bud}\n${ask}\n\nPozdrawiam,\n[Imię] · [Firma]`;
+}
+function openLead(id){
+  const l = leads.find(x=>x.id===id); const {total,r}=scoreLead(l);
+  const next = total>=80?'Zadzwoń lub odpisz w ciągu 1 h; zaproponuj próbki i wizualizację.'
+    : total>=60?'Odpisz dziś z 2–3 wariantami i ceną; przypomnienie za 5 dni.'
+    : 'Odpowiedz na zapytanie, potem pielęgnacja newsletterem (jeśli jest zgoda).';
+  $('#drawer').innerHTML = `
+   <div class="row between"><span class="pill ${total>=80?'green':total>=60?'':'grey'}">${label(total)}</span><button class="btn sm" onclick="closeDrawer()">Zamknij ✕</button></div>
+   <h2 style="margin-top:12px">${l.name}</h2>
+   <div class="muted small">${l.city} · ${SRC[l.src].label} · ${l.ago}</div>
+   <div class="row" style="margin-top:14px;gap:14px;align-items:center"><span class="score ${cls(total)}" style="height:46px;min-width:62px;font-size:22px">${total}</span>
+     <div class="small"><b>Następny krok</b><br>${next}</div></div>
+   <div class="card" style="margin-top:16px;padding:14px">
+     <h3 style="margin-bottom:6px">Skąd ten wynik</h3>
+     ${r.map(x=>`<div class="reason"><span>${x[0]}</span><b>${x[1]} / ${x[2]}</b></div>`).join('')}
+     <div class="tiny muted" style="margin-top:8px">W MVP wagi uczy model na historii: które zapytania kończyły się zakupem.</div>
+   </div>
+   <div class="card" style="margin-top:12px;padding:14px">
+     <div class="row between"><h3>Specyfikacja i zgody</h3></div>
+     <div class="small" style="margin-top:6px">${l.spec}</div>
+     <div style="margin-top:8px">${consentPills(l)}</div>
+     ${(!l.cMail&&!l.cPhone)?'<div class="callout warn" style="margin-top:10px;font-size:13px">Brak zgód marketingowych: odpowiadamy wyłącznie na to zapytanie, bez wpisywania do kampanii.</div>':''}
+   </div>
+   <div style="margin-top:14px">
+     <div class="row between"><h3>Szkic odpowiedzi</h3><span class="pill blue">AI · szkic do akceptacji</span></div>
+     <textarea id="draftTx" style="margin-top:8px">${draft(l)}</textarea>
+     <div class="row" style="margin-top:8px;gap:8px"><button class="btn primary" onclick="copyDraft()">Kopiuj</button><button class="btn" onclick="toast('Zadanie dodane do CRM (w PoC tylko symulacja)')">Dodaj zadanie w CRM</button></div>
+   </div>`;
+  $('#drawer').classList.add('open'); $('#dbg').classList.add('open');
+}
+function closeDrawer(){ $('#drawer').classList.remove('open'); $('#dbg').classList.remove('open'); }
+function copyDraft(){ const t=$('#draftTx').value; try{ navigator.clipboard.writeText(t).then(()=>toast('Skopiowano'),()=>{ $('#draftTx').select(); toast('Zaznaczono tekst — skopiuj ręcznie'); }); }catch(e){ $('#draftTx').select(); toast('Zaznaczono tekst — skopiuj ręcznie'); } }
+
+/* ---------- partnerzy ---------- */
+function renderKanban(){
+  $('#kanban').innerHTML = STAGES.map((s,i)=>{
+    const ps = partners.filter(p=>p.st===i).sort((a,b)=>b.fit-a.fit);
+    return `<div class="col"><h3><span>${s}</span><span class="muted">${ps.length}</span></h3>${ps.map(p=>`
+      <div class="pcard"><div class="row between"><b>${p.n}</b><span class="score ${cls(p.fit)}" style="height:22px;min-width:32px;font-size:12px">${p.fit}</span></div>
+      <div class="tiny muted">${p.c} · ${p.sig}</div>
+      ${i<4?`<button class="btn sm" style="margin-top:8px" onclick="advance('${p.n}')">${i===0?'Napisz na LinkedIn →':'Dalej →'}</button>`:'<div class="tiny" style="margin-top:6px;color:var(--green);font-weight:600">2 stoły w tym kwartale</div>'}
+      </div>`).join('')}</div>`;
+  }).join('');
+}
+function advance(n){
+  const p = partners.find(x=>x.n===n);
+  if(p.st===0){ openInvite(p); return; }
+  p.st=Math.min(4,p.st+1); renderKanban(); toast(`${p.n}: ${STAGES[p.st]}`);
+}
+function openInvite(p){
+  const txt = `Dzień dobry, trafiłem na realizacje ${p.n} (${p.c}) — szczególnie ${p.sig.split(' · ')[0]}. Robimy stoły z drewna i żywicy na wymiar i szukamy kilku pracowni, z którymi chcemy rozwijać wzory pod realne projekty. Chętnie się połączę i wymienię doświadczeniami.`;
+  $('#drawer').innerHTML = `
+   <div class="row between"><span class="pill blue">Zaproszenie LinkedIn · ręcznie</span><button class="btn sm" onclick="closeDrawer()">Zamknij ✕</button></div>
+   <h2 style="margin-top:12px">${p.n}</h2><div class="muted small">${p.c} · dopasowanie ${p.fit}/100</div>
+   <p class="small" style="margin-top:14px">Notatka do zaproszenia (limit ok. 200–300 znaków, zależnie od konta). Bez oferty w pierwszej wiadomości — najpierw relacja, oferta dopiero po odpowiedzi.</p>
+   <textarea id="draftTx" style="min-height:140px">${txt}</textarea>
+   <div class="tiny muted" style="margin-top:4px" id="cc">${txt.length} znaków</div>
+   <div class="row" style="margin-top:10px;gap:8px"><button class="btn primary" onclick="copyDraft()">Kopiuj</button>
+   <button class="btn" onclick="(function(){const x=partners.find(q=>q.n==='${p.n}');x.st=1;renderKanban();closeDrawer();toast('Oznaczono: zaproszenie wysłane')})()">Oznacz jako wysłane</button></div>
+   <div class="callout" style="margin-top:14px;font-size:13px">Aplikacja przygotowuje treść i przypomina o follow-upie. Wysyła człowiek, ze swojego profilu — bez botów.</div>`;
+  $('#draftTx').addEventListener('input',e=>$('#cc').textContent=e.target.value.length+' znaków');
+  $('#drawer').classList.add('open'); $('#dbg').classList.add('open');
+}
+
+/* ---------- kampania ---------- */
+function renderAds(){
+  $('#audChips').innerHTML = AUD.map(a=>`<button class="chip ${audOn.has(a.k)?'on':''}" onclick="toggleAud('${a.k}')">${a.l}</button>`).join('');
+  $('#ads').innerHTML = AUD.filter(a=>audOn.has(a.k)).map(a=>`
+    <div class="ad"><div class="hd"><div class="av" style="background:${a.grad}"></div><div><b class="small">Twoja marka stołów</b><div class="tiny muted">Promowane · ${a.l}</div></div></div>
+    <div class="tx">${a.body}</div>
+    <div class="img" style="background:${a.grad}"></div>
+    <div class="cta"><b>${a.head}</b><span class="btn sm" style="pointer-events:none">${a.k==='hnw'?'Sprawdź':'Wyślij'}</span></div>
+    <div class="tiny muted" style="padding:10px 12px;border-top:1px solid var(--line)"><b>Targetowanie:</b> ${a.tgt}<br><b>Formularz:</b> ${a.cta}</div></div>`).join('') || '<div class="muted">Wybierz grupę odbiorców.</div>';
+  calc();
+}
+function toggleAud(k){ audOn.has(k)?audOn.delete(k):audOn.add(k); renderAds(); }
+function calc(){
+  const B=+$('#budget').value, cpm=+$('#cpm').value||1, ctr=(+$('#ctr').value)/100, cvr=(+$('#cvr').value)/100, l2m=(+$('#l2m').value)/100, m2s=(+$('#m2s').value)/100, aov=+$('#aov').value;
+  $('#bVal').textContent = zl(B);
+  const imp=B/cpm*1000, clk=imp*ctr, ld=clk*cvr, mt=ld*l2m, sl=mt*m2s, rev=sl*aov;
+  const shares = AUD.filter(a=>audOn.has(a.k)); const tot=shares.reduce((a,x)=>a+x.share,0)||1;
+  $('#calcOut').innerHTML = [
+    ['Wyświetlenia',num(imp)],['Kliknięcia',num(clk)],['Leady',num(ld)],['Koszt leada',ld?zl(B/ld):'—'],
+    ['Konsultacje',mt.toFixed(1).replace('.',',')],['Sprzedane stoły',sl.toFixed(1).replace('.',',')],
+    ['Przychód',zl(rev)],['ROAS',(rev/B).toFixed(1).replace('.',',')+'×']
+  ].map(x=>`<div><div class="v">${x[1]}</div><div class="l">${x[0]}</div></div>`).join('') +
+  `<div style="grid-column:1/-1" class="tiny muted">Podział budżetu: ${shares.map(a=>a.l.split(' · ')[0]+' '+Math.round(a.share/tot*100)+'%').join(' · ')||'—'}</div>`;
+}
+['budget','cpm','ctr','cvr','l2m','m2s','aov'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
+
+/* ---------- konfigurator ---------- */
+const WOOD={'Dąb':{p:3200,c1:'#b78452',c2:'#9b6b3e'},'Orzech':{p:4200,c1:'#7a5133',c2:'#5e3c24'},'Wiąz':{p:3600,c1:'#a8754a',c2:'#8a5c36'},'Akacja':{p:2800,c1:'#c08e55',c2:'#a2743f'}};
+const STYLE={'Rzeka':1.0,'Ocean':1.25,'Lity z wtrąceniami':0.85};
+const RESIN={'Granat':'#1e4f86','Szmaragd':'#1f6b55','Bursztyn':'#d1951e','Dymny czarny':'#2a2d31','Lazur':'#3a9dcf'};
+const LEGS={'U-profil':1400,'X-rama':1700,'Pająk':2100};
+let cfg={wood:'Orzech',style:'Rzeka',resin:'Granat',leg:'U-profil'};
+function chipRow(el,obj,key){ $(el).innerHTML = Object.keys(obj).map(k=>`<button type="button" class="chip ${cfg[key]===k?'on':''}" onclick="cfg.${key}='${k}';renderCfg()">${k}</button>`).join(''); }
+function priceCfg(){
+  const L=+$('#len').value, W=+$('#wid').value, area=L*W/10000;
+  return Math.round((area*WOOD[cfg.wood].p*STYLE[cfg.style] + LEGS[cfg.leg]) /100)*100;
+}
+function renderCfg(){
+  chipRow('#woodChips',WOOD,'wood'); chipRow('#styleChips',STYLE,'style'); chipRow('#legChips',LEGS,'leg');
+  $('#resinSw').innerHTML = Object.entries(RESIN).map(([k,c])=>`<div class="sw ${cfg.resin===k?'on':''}" title="${k}" style="background:${c}" onclick="cfg.resin='${k}';renderCfg()"></div>`).join('') + `<span class="small muted" style="align-self:center">${cfg.resin}</span>`;
+  const L=+$('#len').value, W=+$('#wid').value; $('#lenV').textContent=L; $('#widV').textContent=W;
+  const p=priceCfg(); $('#price').textContent = zl(p*0.9)+' – '+zl(p*1.1);
+  $('#specLine').innerHTML = `${cfg.wood} · ${cfg.style.toLowerCase()}<br>${L}×${W} cm · nogi ${cfg.leg}`;
+  drawTable(L,W);
+}
+function drawTable(L,W){
+  const maxW=290, maxH=110, s=Math.min(maxW/L,maxH/W), w=L*s, h=W*s, x=(320-w)/2, y=14;
+  const wd=WOOD[cfg.wood], rc=RESIN[cfg.resin];
+  let resin='';
+  if(cfg.style==='Rzeka') resin=`<path d="M${x+w*0.30},${y} C${x+w*0.48},${y+h*0.3} ${x+w*0.36},${y+h*0.65} ${x+w*0.56},${y+h} L${x+w*0.70},${y+h} C${x+w*0.52},${y+h*0.62} ${x+w*0.64},${y+h*0.35} ${x+w*0.46},${y} Z" fill="url(#rg)"/>`;
+  else if(cfg.style==='Ocean') resin=`<path d="M${x+w*0.55},${y} C${x+w*0.62},${y+h*0.35} ${x+w*0.5},${y+h*0.7} ${x+w*0.6},${y+h} L${x+w},${y+h} L${x+w},${y} Z" fill="url(#rg)"/>`;
+  else resin=[[.22,.3,9],[.47,.62,6],[.7,.4,11],[.82,.72,5],[.35,.8,4]].map(([a,b,r])=>`<ellipse cx="${x+w*a}" cy="${y+h*b}" rx="${r*1.6}" ry="${r}" fill="${rc}" opacity=".9"/>`).join('');
+  const grain=Array.from({length:9},(_,i)=>{const yy=y+h*(i+0.5)/9;return `<path d="M${x},${yy} Q${x+w*0.25},${yy+(i%2?3:-3)} ${x+w*0.5},${yy} T${x+w},${yy}" stroke="${wd.c2}" stroke-width="1" fill="none" opacity=".45"/>`}).join('');
+  const legC='#9aa3ab', ly=y+h, lh=30;
+  let legs='';
+  if(cfg.leg==='U-profil') legs=[x+w*0.1,x+w*0.86].map(lx=>`<path d="M${lx},${ly} v${lh} h${w*0.04} v-${lh}" stroke="${legC}" stroke-width="4" fill="none"/>`).join('');
+  else if(cfg.leg==='X-rama') legs=[x+w*0.08,x+w*0.82].map(lx=>`<path d="M${lx},${ly} L${lx+w*0.1},${ly+lh} M${lx+w*0.1},${ly} L${lx},${ly+lh}" stroke="${legC}" stroke-width="4"/>`).join('');
+  else legs=`<path d="M${x+w*0.5},${ly} v${lh*0.4} M${x+w*0.5},${ly+lh*0.4} L${x+w*0.3},${ly+lh} M${x+w*0.5},${ly+lh*0.4} L${x+w*0.7},${ly+lh} M${x+w*0.5},${ly+lh*0.4} L${x+w*0.45},${ly+lh} M${x+w*0.5},${ly+lh*0.4} L${x+w*0.55},${ly+lh}" stroke="${legC}" stroke-width="4" stroke-linecap="round"/>`;
+  $('#tableSvg').innerHTML = `<defs>
+    <linearGradient id="wg" x1="0" x2="1"><stop offset="0" stop-color="${wd.c1}"/><stop offset="1" stop-color="${wd.c2}"/></linearGradient>
+    <linearGradient id="rg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${rc}" stop-opacity=".95"/><stop offset=".5" stop-color="${rc}" stop-opacity=".75"/><stop offset="1" stop-color="${rc}"/></linearGradient></defs>
+    ${legs}
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="url(#wg)"/>${grain}${resin}
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="none" stroke="rgba(0,0,0,.18)"/>`;
+}
+$('#len').addEventListener('input',renderCfg); $('#wid').addEventListener('input',renderCfg);
+$('#cfgForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const arch=$('#fArch').value==='1';
+  const l={id:Date.now(),name:$('#fName').value.trim()+' (nowy)',city:$('#fCity').value.trim(),src:'cfg',seg:$('#fSeg').value,budget:priceCfg(),time:$('#fTime').value,
+    spec:`${cfg.wood} · ${cfg.style.toLowerCase()} · ${$('#len').value}×${$('#wid').value} · ${cfg.resin.toLowerCase()}`,arch,cMail:$('#cMail').checked,cPhone:$('#cPhone').checked,ago:'przed chwilą'};
+  leads.unshift(l); srcF='all'; renderFilter(); renderLeads(); e.target.reset();
+  toast('Lead zapisany — wynik '+scoreLead(l).total+' pkt'); go('leady'); setTimeout(()=>openLead(l.id),350);
+});
+
+/* ---------- źródła ---------- */
+const SOURCES=[
+ {t:'Własne (first-party)',m:'g',items:['Konfigurator i formularze na stronie','Showroom, targi, polecenia klientów','Newsletter z udokumentowaną zgodą','Piksel / Insight Tag do retargetingu (za zgodą cookies)']},
+ {t:'LinkedIn Campaign Manager',m:'b',items:['Lead Gen Forms → CRM (integracja lub CSV)','Matched Audiences: listy firm, kontaktów, retargeting','Predictive Audiences na bazie konwersji','Sales Navigator do ręcznego researchu pracowni']},
+ {t:'Meta / Instagram, Pinterest, Google Ads',m:'b',items:['Lead Ads z formularzem natywnym','Geotargetowanie na obszary z radaru','Pinterest: intencja „urządzam jadalnię”','Google: frazy „stół z żywicy na wymiar”']},
+ {t:'Rejestry publiczne i statystyka',m:'g',items:['RWDZ (GUNB) — pozwolenia i zgłoszenia budowy domów, w agregacie','GUS BDL (API) — mieszkania oddane, dochody','Google Trends — sezonowość i regiony zainteresowania']},
+ {t:'Katalogi branżowe (kanał architektów)',m:'a',items:['Stowarzyszenie Architektów Wnętrz, Izba Architektów RP','Homebook, Houzz — profile i realizacje pracowni','Google Places API — studia wnętrz w miastach','Media: Architektura & Biznes, Label, Archivolta']},
+ {t:'Wydarzenia i rynek premium',m:'a',items:['Warsaw Home & Contract, 4 Design Days, Meble Polska','Nowe inwestycje premium deweloperów (strony, Otodom)','Galerie, salony kuchni i AGD premium jako partnerzy']}
+];
+function renderSources(){
+  const col={g:'var(--green)',b:'var(--resin-2)',a:'var(--amber)'};
+  $('#srcCards').innerHTML = SOURCES.map(s=>`<div class="card src-card" style="border-top:4px solid ${col[s.m]}"><h3>${s.t}</h3><ul>${s.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`).join('');
+}
+
+/* ---------- start ---------- */
+renderWeights(); renderRadar(); renderFilter(); renderLeads(); renderKanban(); renderAds(); renderCfg(); renderSources(); route();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+function fixGrid(){const m=innerWidth<900; ['#radarGrid','#campGrid'].forEach(s=>$(s).style.gridTemplateColumns=m?'minmax(0,1fr)':(s==='#radarGrid'?'minmax(0,1fr) 300px':'minmax(0,1fr) 340px'));}
+addEventListener('resize',fixGrid); fixGrid();
+</script>
+</body>
+</html>
