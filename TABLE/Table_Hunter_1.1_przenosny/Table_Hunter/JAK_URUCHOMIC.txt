@@ -1,0 +1,47 @@
+TABLE HUNTER 1.1 — WERSJA PRZENOŚNA
+====================================
+
+URUCHOMIENIE (bez instalacji)
+1. Rozpakuj ZIP.
+2. Kliknij dwa razy START.html. Otworzy się w przeglądarce (Chrome, Edge, Safari, Firefox).
+   Nie trzeba internetu, serwera, logowania ani instalacji.
+
+Dane zapisują się w tej przeglądarce na tym komputerze.
+Przeniesienie na inny komputer albo telefon:
+Ustawienia → „Pobierz kopię JSON”, a tam „Wczytaj kopię JSON”.
+
+POKAZ DLA DYREKTORA (ok. 20 minut)
+1. Otwórz START.html i kliknij „Wczytaj dane demo”.
+2. Przejdź do zakładki „Scenariusze”. Jest tam 7 praktycznych sytuacji.
+   Kroki odhaczają się same, gdy dyrektor wykona je w aplikacji.
+   Pełny opis pokazu jest w pliku SCENARIUSZ_POKAZU.md.
+   PRZED POKAZEM: wpisz klucz Google (Ustawienia) i raz uruchom radar,
+   żeby sprawdzić, że działa na tym komputerze.
+3. Po pokazie: Ustawienia → „Wyczyść wszystkie dane”. Od tego momentu pracujecie na prawdziwych zapytaniach.
+
+CO JEST W APLIKACJI
+- Pulpit: kto czeka na odpowiedź, zaległe zadania, wartość rozmów, sprzedaż z 30 dni.
+- Szukaj klienta:
+  * RADAR FIRM: automatycznie przeszukuje Google Maps (architekci, salony meblowe i kuchenne,
+    deweloperzy) i dodaje firmy jednym kliknięciem. Wymaga klucza Google w Ustawieniach,
+    bez klucza działa tryb pokazowy na fikcyjnych firmach.
+  * AGENT AI: gotowe zadanie dla ChatGPT Work lub Claude, który przeszukuje Google, Facebooka
+    i LinkedIn (publiczne strony firm). Wynik wczytujesz jednym kliknięciem.
+  * Gotowe wyszukiwania, frazy i teksty reklam Google i Instagram do skopiowania.
+- Import CSV: leady z formularzy Meta (Instagram/Facebook) i LinkedIn.
+- Zapytania: wynik 0–100 z uzasadnieniem, gotowa odpowiedź z ceną, statusy, zadania, zgody.
+- Wycena: konfigurator stołu z ceną widełkową i zapisem jako zapytanie jednym kliknięciem.
+- Architekci: pracownie partnerskie, ich polecenia, sprzedaż i należna prowizja.
+- Kanały: po co i jak korzystać z każdego kanału, plan na 30 dni, koszt zapytania i ROAS.
+- Ustawienia: firma, podpis i cennik (DO POTWIERDZENIA przez firmę), kopie, CSV,
+  lista do newslettera (tylko osoby ze zgodą).
+
+ZASADY
+Aplikacja nie wysyła wiadomości sama. Gotowy tekst kopiujesz do poczty lub komunikatora.
+Aplikacja nie zbiera kontaktów do osób prywatnych z internetu.
+Ofertę e-mailem lub telefonem do osoby prywatnej wysyłamy tylko za jej zgodą
+(art. 398 Prawa komunikacji elektronicznej). Na zapytanie, które klient wysłał sam,
+odpowiadamy zawsze.
+
+Cennik w Ustawieniach to wartości startowe do demonstracji.
+Przed pierwszą wyceną dla klienta wpiszcie swoje stawki.

@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Table Hunter 1.1 — pracownia sprzedaży stołów</title>
+<style>
+:root{--bg:#f4f1ea;--card:#fffdf8;--ink:#1f2a26;--muted:#6b726c;--line:#e2ddd2;--accent:#1f5c4a;--accent2:#c4652b;--hot:#b8321f;--warm:#c98a1c;--cold:#5a7a8c;--ok:#2f7a4b;--radius:12px;font-size:15px}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:20;background:#16201c;color:#f4f1ea;display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+header.top .brand{font-weight:700;letter-spacing:.3px;margin-right:6px}
+header.top .brand small{display:block;font-weight:400;opacity:.7;font-size:11px}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs button{background:transparent;color:#e9e4d8;border:0;padding:8px 11px;border-radius:8px;cursor:pointer;font-size:14px}
+nav.tabs button.on{background:#f4f1ea;color:#16201c;font-weight:600}
+nav.tabs button .badge{background:var(--hot);color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 80px}
+h1{font-size:26px;margin:4px 0 6px;font-family:Georgia,"Times New Roman",serif;font-weight:600}
+h2{font-size:18px;margin:0 0 10px}
+h3{font-size:15px;margin:14px 0 6px}
+.lead{color:var(--muted);margin:0 0 16px;max-width:760px}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:860px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+@media(max-width:520px){.g4,.g3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.kpi .n{font-size:28px;font-weight:700;font-family:Georgia,serif}
+.kpi .l{color:var(--muted);font-size:13px}
+.kpi.alert{border-color:var(--hot);background:#fff4f1}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+button,.btn{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 12px;border-radius:9px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button:hover,.btn:hover{border-color:#b9b2a3}
+button.primary,.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.warn{background:var(--accent2);border-color:var(--accent2);color:#fff}
+button.danger{color:var(--hot);border-color:#e6b8ae}
+button.small,.btn.small{padding:5px 9px;font-size:13px}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid #d4cec2;border-radius:8px;background:#fff;width:100%;color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+label>input,label>select,label>textarea{margin-top:3px;color:var(--ink)}
+label.check{display:flex;gap:8px;align-items:flex-start;color:var(--ink);font-size:14px}
+label.check input{width:auto;margin-top:3px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--line);padding:8px 6px}
+td{border-bottom:1px solid var(--line);padding:9px 6px;vertical-align:top}
+tr.click{cursor:pointer}tr.click:hover td{background:#faf6ee}
+.scroll{overflow-x:auto}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.hot{background:#fbe1dc;color:var(--hot)}.warm{background:#fbefd6;color:#8a5d08}.cold{background:#e3ecf1;color:#3e5b6b}
+.st{background:#ece8df;color:#4a4a42}.st.won{background:#dcefe2;color:var(--ok)}.st.lost{background:#eee;color:#888}
+.muted{color:var(--muted)}.tiny{font-size:12px}
+.notice{border-radius:10px;padding:10px 12px;background:#eef4f1;border:1px solid #cfe1d8;margin:10px 0;font-size:14px}
+.notice.warn{background:#fff6e8;border-color:#f0d6a8}
+.notice.bad{background:#fff1ee;border-color:#efc2b8}
+.todo{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.todo:last-child{border-bottom:0}
+.todo .what{flex:1}
+.score{font-size:34px;font-weight:700;font-family:Georgia,serif}
+.bar{height:8px;background:#e9e4d8;border-radius:6px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent)}
+.parts td{padding:4px 6px;font-size:13px}
+pre.mail{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;font:13.5px/1.5 system-ui,sans-serif;margin:0}
+.modal-bg{position:fixed;inset:0;background:rgba(15,20,18,.45);z-index:50;display:flex;justify-content:center;align-items:flex-start;padding:30px 12px;overflow:auto}
+.modal{background:var(--bg);border-radius:14px;max-width:920px;width:100%;padding:18px 18px 22px;position:relative}
+.modal .x{position:absolute;right:12px;top:10px}
+@media(max-width:600px){.modal-bg{padding:0}.modal{border-radius:0;min-height:100vh}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#16201c;color:#fff;padding:10px 16px;border-radius:10px;z-index:99;max-width:92vw;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.toast.bad{background:var(--hot)}
+.steps{counter-reset:s;padding-left:0;list-style:none;margin:6px 0}
+.steps li{counter-increment:s;padding:6px 0 6px 34px;position:relative;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:6px;width:24px;height:24px;border-radius:50%;background:#e6e0d3;text-align:center;font-weight:700;font-size:13px;line-height:24px}
+.steps li.done::before{content:"✓";background:var(--ok);color:#fff}
+.chan{border-left:4px solid var(--accent)}
+.chan.p2{border-left-color:var(--warm)}.chan.p3{border-left-color:#aab2ad}
+.chan h3{margin-top:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv b{color:var(--muted);font-weight:600}
+.price{font-size:30px;font-weight:700;font-family:Georgia,serif;color:var(--accent)}
+.opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.opts button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.legal{font-size:13px}
+details summary{cursor:pointer;font-weight:600}
+.hide{display:none!important}
+
+.radar-log{background:#16201c;color:#d9e8df;border-radius:10px;padding:10px 12px;margin-top:10px;font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;position:relative}
+.radar-log .bad{color:#ffb4a6}.radar-log .muted{color:#7e968a}
+.pulse{position:absolute;right:12px;top:8px;color:#7ee2a8;animation:pl 1s infinite}@keyframes pl{50%{opacity:.2}}
+tr.appear{animation:ap .35s ease both}@keyframes ap{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.auto-card{border:2px solid var(--accent);background:linear-gradient(180deg,#f2f8f5,#fffdf8)}
+@media(prefers-reduced-motion:reduce){tr.appear,.pulse{animation:none}}
+@media(max-width:700px){header.top{position:static}nav.tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch}nav.tabs button{white-space:nowrap}}
+@media print{header.top,.noprint{display:none!important}body{background:#fff}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="brand">TABLE HUNTER 1.1<small id="brand-sub">wersja przenośna</small></div>
+ <nav class="tabs" id="tabs"></nav>
+</header>
+<main id="view"></main>
+<div id="modal-root"></div>
+<script>
+'use strict';
+/* =========================================================================================
+   TABLE HUNTER 1.0 — wersja przenośna (jeden plik). Dane zapisują się w tej przeglądarce
+   (localStorage). Kopia: Ustawienia → Pobierz kopię JSON. Bez serwera, bez logowania.
+   Aplikacja NIE wysyła wiadomości sama i NIE zbiera kontaktów z internetu — obsługuje klientów,
+   którzy sami zostawili zapytanie (art. 398 Prawa komunikacji elektronicznej: oferta e-mailem /
+   telefonem do osoby prywatnej wymaga jej uprzedniej zgody).
+   ========================================================================================= */
+const VERSION='1.1.0',KEY='tableHunter.v1';
+const DAY=86400000;
+const $=s=>document.querySelector(s);
+const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const nowIso=()=>new Date().toISOString();
+const dayIso=(d=new Date())=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');};
+const addDays=(n,from=new Date())=>dayIso(new Date(new Date(from).getTime()+n*DAY));
+const zl=n=>(Math.round(Number(n)||0)).toLocaleString('pl-PL')+' zł';
+const fmtDate=iso=>{if(!iso)return '—';const d=new Date(iso.length===10?iso+'T12:00:00':iso);return d.toLocaleDateString('pl-PL',{day:'2-digit',month:'2-digit'})+(iso.length>10?' '+d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}):'');};
+const hoursSince=iso=>(Date.now()-new Date(iso).getTime())/3600000;
+
+// ---------- słowniki ----------
+const SOURCES={
+ google:{n:'Google (wyszukiwarka, Mapy)',pts:10},
+ meta:{n:'Instagram / Facebook (formularz)',pts:6},
+ www:{n:'Strona / konfigurator',pts:10},
+ architect:{n:'Polecenie architekta',pts:15},
+ referral:{n:'Polecenie klienta',pts:15},
+ showroom:{n:'Ekspozycja u partnera / showroom',pts:12},
+ fair:{n:'Targi / dzień otwarty',pts:10},
+ portal:{n:'Homebook / Houzz / Oferteo',pts:8},
+ marketplace:{n:'Allegro / OLX (gotowe stoły)',pts:4},
+ inbound:{n:'Telefon / e-mail od klienta',pts:10},
+ export:{n:'Eksport (Etsy, DE/AT)',pts:6},
+ linkedin:{n:'LinkedIn (formularz)',pts:8}
+};
+const STATUSES=[['new','Nowe'],['contact','Rozmowa'],['quote','Wycena wysłana'],['samples','Próbki / wizyta'],['deposit','Zaliczka'],['won','Sprzedane'],['lost','Utracone']];
+const STATUS=Object.fromEntries(STATUSES);
+const OPEN=['new','contact','quote','samples','deposit'];
+const TIMELINES={m1:['do 1 miesiąca',20],m3:['1–3 miesiące',15],m6:['3–6 miesięcy',8],later:['6+ mies. / nie wie',3]};
+const INTERIORS={house:['Nowy dom',15],apartment:['Apartament premium',15],dining:['Zmiana jadalni',10],office:['Biuro / sala konferencyjna',12]};
+const LOST=['Za drogo','Kupił gdzie indziej','Odłożył zakup','Brak kontaktu','Nie nasz produkt','Inny powód'];
+const PSTAGES=[['found','Zidentyfikowana'],['first','Pierwszy kontakt'],['meeting','Spotkanie'],['samples','Próbki w pracowni'],['active','Aktywny partner']];
+const PSTAGE=Object.fromEntries(PSTAGES);
+const PNEXT={found:'Pierwszy kontakt: wiadomość na LinkedIn albo telefon do biura pracowni — przedstaw program partnerski (bez ofert e-mailem przed zgodą).',first:'Umów 30 min spotkania w pracowni z zestawem próbek i katalogiem realizacji.',meeting:'Zostaw zestaw próbek i pliki 3D; ustal prowizję i sposób polecania klientów.',samples:'Po 2 tygodniach zapytaj o projekt, w którym stół może się pojawić — zaproponuj wizualizację w 48 h.',active:'Raz w miesiącu: nowe realizacje, rozliczenie prowizji, pytanie o kolejne projekty.'};
+
+function defaults(){return {
+ brand:'Premium Resin',seller:'Michał Zieliński',phone:'661 088 383',email:'biuro@premiumresin.pl',respondHours:1,commission:10,delivery:600,months:3,
+ woods:{dab:{n:'Dąb',m2:5200},orzech:{n:'Orzech amerykański',m2:7500},wiaz:{n:'Wiąz',m2:6000},akacja:{n:'Akacja / suar',m2:4800}},
+ styles:{river:{n:'Rzeka',k:1},ocean:{n:'Ocean (żywica na krawędzi)',k:1.15},solid:{n:'Lity z wtrąceniami',k:1.35}},
+ legs:{u:{n:'U-profil',p:1400},x:{n:'X-rama',p:1900},spider:{n:'Pająk',p:2600}},
+ finishes:{oil:{n:'Olej-wosk',k:0},lacquer:{n:'Lakier 2K (mat)',k:.08}},
+ colors:['Transparentna','Granat','Szmaragd','Grafit','Biel perłowa','Bursztyn']
+};}
+function emptyState(){return {v:1,settings:defaults(),leads:[],tasks:[],partners:[],costs:{},playbook:{},demo:false};}
+
+// ---------- zapis ----------
+let storageOK=true;
+function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return emptyState();const s=JSON.parse(raw);return normalize(s);}catch(e){storageOK=false;return emptyState();}}
+function normalize(s){const d=emptyState();s={...d,...s};s.settings={...defaults(),...(s.settings||{})};for(const k of ['leads','tasks','partners'])if(!Array.isArray(s[k]))s[k]=[];s.costs=s.costs&&typeof s.costs==='object'?s.costs:{};s.playbook=s.playbook&&typeof s.playbook==='object'?s.playbook:{};return s;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true;}catch(e){storageOK=false;}}
+let state=load();
+
+// ---------- wycena ----------
+function quote(c,S=state.settings){
+ const w=S.woods[c.wood]||Object.values(S.woods)[0],st=S.styles[c.style]||Object.values(S.styles)[0],lg=S.legs[c.legs]||Object.values(S.legs)[0],f=S.finishes[c.finish]||{k:0};
+ const L=Math.min(400,Math.max(60,Number(c.len)||200)),W=Math.min(140,Math.max(40,Number(c.wid)||90)),area=L*W/10000;
+ const base=(area*w.m2*st.k+lg.p)*(1+f.k)+Number(S.delivery||0);
+ const r=x=>Math.round(x/100)*100;
+ return {lo:r(base*.92),hi:r(base*1.08),mid:r(base),area,label:`${w.n}, ${st.n.toLowerCase()}${c.color?', żywica '+c.color.toLowerCase():''}, ${L}×${W} cm, nogi aluminiowe ${lg.n}`};
+}
+const defConfig=()=>({wood:'orzech',style:'river',color:'Granat',legs:'u',finish:'oil',len:220,wid:95});
+
+// ---------- scoring ----------
+function score(l){
+ const parts=[];let pts=0;const add=(label,p,why)=>{parts.push([label,p,why]);pts+=p;};
+ const q=l.config?quote(l.config):null,b=Number(l.budget)||0;
+ if(!b)add('Budżet',8,'nie podano — zapytaj w rozmowie');
+ else if(!q)add('Budżet',b>=15000?25:b>=9000?15:5,zl(b)+' (bez konfiguracji stołu)');
+ else{const r=b/q.mid;add('Budżet',r>=1?30:r>=.8?20:r>=.6?10:0,`${zl(b)} wobec ok. ${zl(q.mid)} za wybrany stół`+(r<.8?' — zaproponuj mniejszy blat lub dąb':''));}
+ const t=TIMELINES[l.timeline];add('Termin',t?t[1]:5,t?t[0]:'nie podano');
+ const i=INTERIORS[l.interior];add('Wnętrze',i?i[1]:6,i?i[0]:'nie podano');
+ if(l.architect)add('Architekt',10,'pracuje z architektem — decyzja szybsza, warto go włączyć');
+ const s=SOURCES[l.source];add('Źródło',s?s.pts:5,s?s.n:'inne');
+ if(l.phone||l.email)add('Kontakt',5,[l.phone&&'telefon',l.email&&'e-mail'].filter(Boolean).join(' + '));
+ pts=Math.min(100,pts);
+ const level=pts>=75?'hot':pts>=50?'warm':'cold';
+ return {pts,parts,level,label:{hot:'Gorące',warm:'Ciepłe',cold:'Chłodne'}[level],sla:{hot:'odpowiedz w ciągu '+state.settings.respondHours+' h',warm:'odpowiedz dziś',cold:'odpowiedz w 48 h, potem przypomnienie'}[level],q};
+}
+const lvlPill=sc=>`<span class="pill ${sc.level}">${sc.label} · ${sc.pts}</span>`;
+const stPill=s=>`<span class="pill st ${s==='won'?'won':s==='lost'?'lost':''}">${h(STATUS[s]||s)}</span>`;
+
+// ---------- następny krok ----------
+function nextStep(l){
+ if(l.status==='new')return 'Odpowiedz klientowi ('+score(l).sla+'): wycena widełkowa + propozycja rozmowy lub wideo z pracowni.';
+ return {contact:'Wyślij wycenę i zdjęcia desek do wyboru; ustal termin decyzji.',quote:'Po 3 dniach przypomnij się: zaproponuj próbki żywicy w wybranym kolorze lub wizualizację we wnętrzu.',samples:'Umów odbiór próbek / wizytę w pracowni; zaproponuj termin zaliczki i rezerwację deski.',deposit:'Potwierdź projekt i termin produkcji; wyślij zdjęcia wybranej deski.',won:'Po montażu poproś o zdjęcia i polecenie (program poleceń — rabat dla znajomych).',lost:'Zapisz powód. Jeśli jest zgoda na e-mail — dodaj do inspiracji raz w miesiącu.'}[l.status]||'';
+}
+function openTasks(l){return state.tasks.filter(t=>t.leadId===l.id&&!t.done);}
+
+// ---------- treść odpowiedzi ----------
+function reply(l,kind){
+ const S=state.settings,q=l.config?quote(l.config):null;
+ const src={meta:'z Instagrama',google:'',www:'ze strony',architect:'— polecenie od Pani/Pana architekta',referral:'z polecenia',showroom:'po obejrzeniu stołu na ekspozycji',fair:'po rozmowie na targach',portal:'',marketplace:'',inbound:'',export:''}[l.source]||'';
+ const tl={m1:'Przy terminie do miesiąca warto zarezerwować deskę już teraz.',m3:'W terminie 1–3 miesięcy spokojnie zdążymy z realizacją.',m6:'Mamy czas, żeby wybrać idealną deskę i dopracować projekt.',later:'Chętnie przygotuję projekt z wyprzedzeniem — bez zobowiązań.'}[l.timeline]||'';
+ const sign=`\n\nZ poważaniem\n${S.seller}\n${S.brand} · ${S.phone} · ${S.email}`;
+ const cfg=q?`Stół, o który Pan/Pani pyta (${q.label}), to orientacyjnie ${zl(q.lo)}–${zl(q.hi)} brutto, z dostawą i montażem.`:'Cena zależy od gatunku drewna, wymiarów i stylu żywicy — dla stołu 220×95 cm z orzecha to orientacyjnie '+zl(quote(defConfig()).lo)+'–'+zl(quote(defConfig()).hi)+'.';
+ const subj=`Stół z żywicy${q?' — '+q.label.split(',')[0]+' '+(l.config.len||'')+'×'+(l.config.wid||''):''} · ${S.brand}`;
+ if(kind==='followup'||l.status==='quote')return {subject:'Re: '+subj,body:`Dzień dobry,\n\nwracam w sprawie wyceny stołu.${q?' ('+q.label+')':''} Czy mogę pomóc w decyzji? Mogę:\n• wysłać próbki żywicy w wybranym kolorze i fragment drewna,\n• przygotować wizualizację stołu w Pani/Pana wnętrzu (wystarczy zdjęcie jadalni),\n• pokazać deski, z których wybierzemy blat — na wideo albo w pracowni.\n\nKtóra opcja będzie najwygodniejsza?`+sign};
+ if(kind==='after')return {subject:'Dziękujemy za zaufanie · '+S.brand,body:`Dzień dobry,\n\ndziękujemy za wybór naszego stołu. Jeśli wszystko się podoba, będziemy wdzięczni za 2–3 zdjęcia stołu we wnętrzu — i za polecenie nas znajomym: osoba z Pani/Pana polecenia otrzyma rabat, a Pan/Pani — prezent przy kolejnym zamówieniu.`+sign};
+ return {subject:subj,body:`Dzień dobry,\n\ndziękuję za zapytanie${src?' '+src:''}. ${cfg}${l.budget&&q&&Number(l.budget)<q.lo?' Jeśli budżet ma zostać przy '+zl(l.budget)+', zaproponuję mniejszy blat albo dąb zamiast orzecha — efekt rzeki zostaje.':''}\n\nKażdy blat powstaje z jednego kawałka drewna, który wybieramy razem — przed produkcją wysyłamy zdjęcia desek do akceptacji i wizualizację stołu we wnętrzu. Nogi wykonujemy z aluminium we własnej produkcji. ${tl}\n\nProponuję krótką rozmowę (15 minut) albo wideo z pracowni — pasuje jutro o 10:00 lub o 17:00?${l.architect?'\n\nChętnie przekażemy też próbki i pliki 3D Pani/Pana architektowi.':''}`+sign};
+}
+
+// ---------- kanały: po co i jak ----------
+const PLAYBOOK=[
+ {id:'architect',p:1,why:'Architekt decyduje o meblach w drogich wnętrzach. Jedna aktywna pracownia to kilka–kilkanaście stołów rocznie, a klient z polecenia architekta kupuje szybciej i rzadziej negocjuje cenę.',how:['Wypisz 30 pracowni z regionu z realizacjami domów i apartamentów premium (Homebook, Houzz, Instagram, Stowarzyszenie Architektów Wnętrz) — zakładka Architekci → „+ Dodaj pracownię”.','Pierwszy kontakt: wiadomość na LinkedIn albo telefon do biura pracowni z propozycją 30-minutowego spotkania. Ofertę e-mailem wysyłaj dopiero po zgodzie.','Na spotkanie zabierz zestaw próbek żywicy i drewna, katalog realizacji i warunki programu: prowizja '+'(Ustawienia) od każdego stołu, wizualizacja w 48 h, pliki 3D.','Gdy architekt poleci klienta — w zakładce Architekci kliknij „+ Polecenie klienta”. Aplikacja liczy prowizję i pokazuje, które pracownie przynoszą sprzedaż.'],cost:'czas handlowca + zestawy próbek (ok. 300–500 zł / pracownia)',time:'pierwsze polecenia po 1–3 miesiącach',measure:'Architekci: polecenia, sprzedaż i prowizja na pracownię'},
+ {id:'google',p:1,why:'Osoba, która wpisuje „stół z żywicy na wymiar” albo „stół rzeka orzech”, już szuka — to najwyższa intencja zakupu. Wizytówka w Mapach daje zaufanie i telefony z okolicy.',how:['Załóż / uzupełnij Profil Firmy w Google: zdjęcia realizacji, godziny, telefon, link do konfiguratora; poproś każdego klienta o opinię.','Kampania w wyszukiwarce na frazy: stół z żywicy na wymiar, stół rzeka, stół z żywicy epoksydowej, stół z orzecha na wymiar + nazwy miast z wysokim popytem.','Wyklucz frazy tanie i DIY: „żywica do stołu”, „jak zrobić”, „tanio”, „używany”.','Reklama prowadzi do konfiguratora z ceną od razu — każde wysłane zapytanie wpisz tu ze źródłem „Google”, a koszt kampanii w polu „Koszt / mies.” poniżej.'],cost:'od 1 500–3 000 zł / mies. (start, do weryfikacji po 3 tygodniach)',time:'pierwsze zapytania w 1–2 tygodnie',measure:'Kanały: zapytania, koszt zapytania, sprzedaż z Google'},
+ {id:'meta',p:1,why:'Stół z żywicą jest produktem „wow” — film z wylewania żywicy i montażu u klienta zatrzymuje kciuk. Instagram/Facebook budzą potrzebę u osób, które urządzają dom, zanim zaczną szukać.',how:['Co tydzień 2–3 krótkie filmy (Reels): wybór deski, wylewanie żywicy, szlif, stół u klienta. To paliwo dla reklam i dla architektów.','Kampania „pozyskiwanie kontaktów” z formularzem natywnym: wymiary, budżet, termin + dwie OSOBNE, niezaznaczone zgody (e-mail, telefon).','Kierowanie: województwa i aglomeracje z największą liczbą nowych domów, zainteresowania wnętrza / architektura / budowa domu, wiek 30–60; osobno retargeting osób, które oglądały filmy.','Nowe zapytania z formularza wpisuj tu codziennie (źródło „Instagram / Facebook”) i odpowiadaj w 1 h — z tego kanału zapytania szybko stygną.'],cost:'od 2 000–4 000 zł / mies.',time:'pierwsze zapytania w kilka dni',measure:'Kanały: zapytania, gorące, koszt zapytania'},
+ {id:'showroom',p:2,why:'Drogi stół trzeba zobaczyć i dotknąć. Ekspozycja u partnera daje kontakt z klientem, który właśnie urządza wnętrze i ma budżet.',how:['Zaproponuj stół ekspozycyjny salonowi kuchni premium, galerii wnętrz, salonowi AGD lub deweloperowi do apartamentu pokazowego.','Przy stole tabliczka z QR do konfiguratora i kodem partnera; partner dostaje prowizję jak architekt.','Każde zapytanie z ekspozycji wpisz ze źródłem „Ekspozycja u partnera”.'],cost:'stół ekspozycyjny (koszt produkcji) + prowizja',time:'1–2 miesiące',measure:'Kanały: zapytania z ekspozycji i ich sprzedaż'},
+ {id:'referral',p:2,why:'Zadowolony klient pokazuje stół każdemu gościowi. Polecenie to najtańszy i najlepiej konwertujący lead.',how:['Po montażu: wiadomość z prośbą o zdjęcia i polecenie (gotowa treść na karcie zapytania → „Po sprzedaży”).','Rabat dla poleconego i prezent (np. podkładki z żywicy) dla polecającego.','Zdjęcia od klientów publikuj (za zgodą) na Instagramie i w Profilu Google.'],cost:'rabat / prezent tylko od sprzedaży',time:'od pierwszych sprzedaży',measure:'Kanały: polecenia klientów'},
+ {id:'portal',p:2,why:'Na Homebook, Houzz i Oferteo ludzie, którzy urządzają wnętrza, przeglądają realizacje i sami wysyłają zapytania o meble na wymiar.',how:['Profil firmy z 15–20 najlepszymi zdjęciami realizacji i opisem (wymiary, drewno, cena „od”).','Odpowiadaj na zapytania z portali tego samego dnia.','Wpisuj je ze źródłem „Homebook / Houzz / Oferteo”, żeby porównać z innymi kanałami.'],cost:'0 zł (profil) do kilkuset zł / mies. (pakiety)',time:'2–6 tygodni',measure:'Kanały'},
+ {id:'fair',p:3,why:'Targi wnętrzarskie i dni otwarte w pracowni przyciągają osoby w trakcie urządzania domu oraz architektów.',how:['Dzień otwarty w pracowni raz na kwartał (zaproszenia do osób ze zgodą i do pracowni architektów).','Na targach zbieraj zapytania na telefonie przez „+ Nowe zapytanie” — od razu ze zgodami.'],cost:'stoisko / catering',time:'jednorazowo, z opóźnionym efektem',measure:'Kanały'},
+ {id:'export',p:3,why:'W Niemczech, Austrii i Skandynawii stoły z żywicy sprzedają się drożej. Reklamy na Pintereście nie są dostępne do samodzielnego ustawienia dla Polski, ale działają na rynki DE/AT.',how:['Sklep na Etsy z 3–5 gotowymi stołami i opcją „na wymiar”.','Pinterest: tablice z realizacjami po niemiecku i angielsku; reklamy kierowane na DE/AT.','Wycena z transportem paletowym; zapytania ze źródłem „Eksport”.'],cost:'prowizje Etsy, transport',time:'2–3 miesiące',measure:'Kanały'},
+ {id:'marketplace',p:3,why:'Allegro i OLX nie sprzedadzą stołu za 20 tys. zł na wymiar, ale dobrze sprzedają gotowe egzemplarze i przyprowadzają ludzi do konfiguratora.',how:['Wystaw 2–3 gotowe stoły (np. krótsze serie, stoliki kawowe) z informacją „wykonujemy też na wymiar”.','Zapytania przenoś do aplikacji ze źródłem „Allegro / OLX”.'],cost:'prowizje portalu',time:'od razu',measure:'Kanały'}
+];
+const PLAN30=[
+ ['w1a','Tydzień 1','Profil Firmy w Google uzupełniony: zdjęcia, telefon, link do konfiguratora'],
+ ['w1b','Tydzień 1','Lista 30 pracowni architektów w Architektach (stan „Zidentyfikowana”)'],
+ ['w1c','Tydzień 1','Nagrane 3 krótkie filmy: deska, wylewanie żywicy, stół u klienta'],
+ ['w2a','Tydzień 2','Start kampanii Google (frazy z „na wymiar”) — koszt wpisany w Kanałach'],
+ ['w2b','Tydzień 2','Start formularza Instagram/Facebook z osobnymi zgodami'],
+ ['w2c','Tydzień 2','10 pierwszych kontaktów z pracowniami (LinkedIn / telefon)'],
+ ['w3a','Tydzień 3','5 spotkań z architektami z próbkami'],
+ ['w3b','Tydzień 3','Propozycja stołu ekspozycyjnego dla 2 salonów premium'],
+ ['w4a','Tydzień 4','Przegląd Kanałów: koszt zapytania i sprzedaży — przesunięcie budżetu do najlepszego kanału'],
+ ['w4b','Tydzień 4','Każde zapytanie z 30 dni ma status i następny krok (zero zapytań bez odpowiedzi)']
+];
+
+// ---------- scenariusze demo ----------
+const SCEN=[
+ {id:'s0',t:'Automatyczne szukanie firm-partnerów — Google, Facebook, LinkedIn',why:'Pokazuje, gdzie i jak szukamy klientów na drogie stoły: architekci, partnerzy ekspozycji, reklamy dla osób, które szukają same.',steps:[
+  ['Wejdź w „Szukaj klienta” i wybierz miasto (np. Kraków).',s=>!!s.huntCity&&s.huntCity!=='Warszawa','hunt'],
+  ['Kliknij „▶ Szukaj automatycznie” w Radarze firm — zobacz, jak Google Maps zwraca kolejne pracownie i salony.',s=>(s.radarRuns||0)>0,'hunt'],
+  ['Zaznacz najlepsze firmy i kliknij „Dodaj zaznaczone do Architektów i partnerów”.',s=>s.partners.some(p=>p.via==='radar'),'hunt'],
+  ['Agent AI: kliknij „▶ Uruchom agenta” i „Kopiuj zadanie” — agent przeszuka Google, Facebooka i LinkedIn.',s=>!!s.agentCopied,'hunt'],
+  ['Skopiuj frazy Google albo tekst reklamy Instagram — gotowe do wklejenia w kampanię.',s=>(s.huntCopied||0)>0,'hunt']]},
+ {id:'s1',t:'Gorące zapytanie z Instagrama — odpowiedź w 1 h',why:'Klient z reklamy stygnie w kilka godzin. Aplikacja mówi, kto pierwszy i co napisać.',steps:[
+  ['Na Pulpicie zobacz sekcję „Do zrobienia teraz” — na górze jest gorące zapytanie bez odpowiedzi.',()=>true,'pulpit'],
+  ['Kliknij „+ Nowe zapytanie” i wpisz klienta: źródło Instagram / Facebook, Kraków, budżet 22 000 zł, termin do 1 miesiąca, nowy dom, stół 240×100 orzech. Wynik pokaże „Gorące”.',s=>s.leads.some(l=>!l.demo&&l.source==='meta'),'new'],
+  ['Otwórz kartę: sprawdź wynik (dlaczego tyle punktów) i gotową odpowiedź z ceną. Kliknij „Kopiuj odpowiedź” albo „Otwórz w poczcie”.',s=>s.leads.some(l=>!l.demo&&l.source==='meta'&&l.replied),'leads'],
+  ['Ustaw status „Rozmowa” i dodaj zadanie „Telefon do klienta” na jutro.',s=>s.leads.some(l=>!l.demo&&l.source==='meta'&&l.status!=='new'&&s.tasks.some(t=>t.leadId===l.id)),'leads']]},
+ {id:'s2',t:'Klient z konfiguratora — wycena i zapytanie w 1 minutę',why:'Konfigurator to magnes: klient sam podaje wymiary i budżet, a handlowiec ma gotową cenę.',steps:[
+  ['Wejdź w Wycenę: orzech, 260×100 cm, Ocean, nogi Pająk — zobacz cenę.',s=>!!s.lastQuote&&s.lastQuote.len>=250,'quote'],
+  ['Kliknij „Zapisz jako zapytanie”, wpisz imię i e-mail klienta.',s=>s.leads.some(l=>!l.demo&&l.source==='www'&&l.config&&l.config.style==='ocean'),'quote'],
+  ['W karcie zapytania sprawdź, że odpowiedź zawiera tę cenę i ustaw status „Wycena wysłana”. Zadanie przypomnienia za 3 dni doda się samo.',s=>s.leads.some(l=>!l.demo&&l.source==='www'&&l.status==='quote'),'leads']]},
+ {id:'s3',t:'Polecenie od architekta — kanał B2B2C',why:'Jedna aktywna pracownia to kilka–kilkanaście stołów rocznie. Aplikacja liczy, kto przynosi sprzedaż i ile prowizji się należy.',steps:[
+  ['W zakładce Architekci otwórz pracownię „Studio Forma” i zobacz następny krok.',()=>true,'partners'],
+  ['Kliknij „+ Polecenie klienta” przy tej pracowni i zapisz zapytanie.',s=>s.leads.some(l=>!l.demo&&l.source==='architect'&&l.partnerId),'partners'],
+  ['Oznacz to zapytanie jako „Sprzedane” (kwota np. 24 000 zł) i wróć do Architektów — prowizja jest policzona.',s=>s.leads.some(l=>!l.demo&&l.source==='architect'&&l.status==='won'),'leads']]},
+ {id:'s4',t:'Nic nie ginie — przypomnienia',why:'Większość drogich stołów sprzedaje się po 2.–3. kontakcie. Zaległe zadania są na czerwono na Pulpicie.',steps:[
+  ['Na Pulpicie znajdź zaległe zadanie „Przypomnienie po wycenie”.',()=>true,'pulpit'],
+  ['Otwórz kartę klienta, skopiuj gotowe przypomnienie (próbki / wizualizacja).',s=>s.leads.some(l=>l.followupCopied),'pulpit'],
+  ['Oznacz zadanie jako zrobione i dodaj kolejne za 7 dni.',s=>s.tasks.some(t=>t.demoOverdue&&t.done)&&s.tasks.some(t=>!t.done&&!t.demo),'pulpit']]},
+ {id:'s5',t:'Który kanał zarabia — decyzja o budżecie',why:'Pieniądze przesuwamy tam, gdzie jest sprzedaż, a nie tam, gdzie jest najwięcej kliknięć.',steps:[
+  ['W zakładce Kanały przeczytaj „Po co” i „Jak to zrobić” dla trzech kanałów priorytetu 1.',()=>true,'channels'],
+  ['Wpisz koszt miesięczny: Instagram/Facebook 3 000 zł, Google 2 500 zł.',s=>Number(s.costs.meta)>0&&Number(s.costs.google)>0,'channels'],
+  ['Porównaj koszt zapytania i zwrot (ROAS) — przeczytaj rekomendację przy każdym kanale.',()=>true,'channels']]},
+ {id:'s6',t:'Zgody i bezpieczeństwo prawne',why:'Ofertę e-mailem lub telefonem do osoby prywatnej można wysłać tylko za jej zgodą (art. 398 Prawa komunikacji elektronicznej). Aplikacja pilnuje zgód.',steps:[
+  ['Otwórz zapytanie „Tomasz W.” (demo) — brak zgody na e-maile marketingowe.',()=>true,'leads'],
+  ['W Ustawieniach kliknij „Lista do newslettera (tylko zgody)” — osoby bez zgody nie trafią na listę.',s=>!!s.newsletterExported,'settings'],
+  ['Przeczytaj w Kanałach sekcję „Czego nie robimy”.',()=>true,'channels']]}
+];
+
+// ---------- dane demo ----------
+function demoState(){
+ const s=emptyState();s.demo=true;const now=new Date();const ago=(d,h=0)=>new Date(now.getTime()-d*DAY-h*3600000).toISOString();
+ const P=(name,city,person,stage,extra={})=>({id:uid(),name,city,person,email:'',phone:'',website:'',type:'architect',stage,notes:'',created:ago(30),demo:true,...extra});
+ const p1=P('Studio Forma','Warszawa','Anna Lis','active'),p2=P('Wnętrza Nord','Gdańsk','Piotr Wróbel','samples'),p3=P('Atelier Kubik','Kraków','Ewa Kubik','meeting'),p4=P('Pracownia Linia','Wrocław','Marek Sowa','first'),p5=P('Dom i Detal','Lublin','Kasia Nowak','found');
+ s.partners=[p1,p2,p3,p4,p5];
+ const L=(o)=>({id:uid(),created:ago(o.d||0,o.h||0),name:'',city:'',email:'',phone:'',source:'meta',budget:0,timeline:'m3',interior:'house',architect:false,config:defConfig(),status:'new',consents:{email:false,phone:false},notes:'',history:[],demo:true,...o});
+ const leads=[
+  L({name:'Anna Kowalczyk',city:'Konstancin-Jeziorna',email:'anna.k@example.com',phone:'600 100 200',source:'meta',budget:26000,timeline:'m1',interior:'house',config:{...defConfig(),len:240,wid:100},h:1,d:0,consents:{email:true,phone:true}}),
+  L({name:'Marek Zieliński',city:'Piaseczno',email:'marek.z@example.com',source:'google',budget:18000,timeline:'m3',interior:'house',d:0,h:5,consents:{email:false,phone:true},phone:'601 200 300'}),
+  L({name:'Joanna Mazur',city:'Warszawa',email:'j.mazur@example.com',source:'architect',partnerId:p1.id,architect:true,budget:30000,timeline:'m3',interior:'apartment',config:{...defConfig(),len:260,wid:100,style:'ocean',legs:'spider'},status:'samples',d:9,consents:{email:true,phone:true}}),
+  L({name:'Tomasz Wiśniewski',city:'Gdańsk',email:'t.wisniewski@example.com',source:'portal',budget:15000,timeline:'m6',interior:'dining',status:'quote',d:6,consents:{email:false,phone:false},quoteAt:ago(5)}),
+  L({name:'Katarzyna Lewandowska',city:'Kraków',email:'k.lew@example.com',phone:'602 300 400',source:'www',budget:22000,timeline:'m3',interior:'apartment',config:{...defConfig(),wood:'wiaz',len:220,wid:95},status:'quote',d:8,consents:{email:true,phone:true},quoteAt:ago(4)}),
+  L({name:'Paweł Dąbrowski',city:'Wrocław',email:'pawel.d@example.com',source:'meta',budget:9000,timeline:'later',interior:'dining',d:2,consents:{email:true,phone:false}}),
+  L({name:'Firma Horyzont (sala zarządu)',city:'Poznań',email:'biuro@horyzont.example',phone:'61 555 66 77',source:'inbound',budget:45000,timeline:'m3',interior:'office',config:{...defConfig(),len:380,wid:120,legs:'x'},status:'contact',d:3,consents:{email:true,phone:true}}),
+  L({name:'Agnieszka Wójcik',city:'Warszawa',email:'aga.w@example.com',source:'referral',budget:24000,timeline:'m1',interior:'house',status:'deposit',d:20,consents:{email:true,phone:true}}),
+  L({name:'Robert Kamiński',city:'Sopot',email:'r.kaminski@example.com',source:'architect',partnerId:p2.id,architect:true,budget:28000,timeline:'m3',interior:'house',config:{...defConfig(),len:250,wid:100},status:'won',wonValue:27400,wonAt:ago(6),d:40,consents:{email:true,phone:true}}),
+  L({name:'Magdalena Szymańska',city:'Warszawa',email:'m.szym@example.com',source:'architect',partnerId:p1.id,architect:true,budget:21000,timeline:'m3',interior:'apartment',status:'won',wonValue:21600,wonAt:ago(18),d:55,consents:{email:true,phone:true}}),
+  L({name:'Łukasz Kaczmarek',city:'Katowice',email:'l.kacz@example.com',source:'google',budget:20000,timeline:'m3',interior:'house',status:'won',wonValue:19800,wonAt:ago(11),d:35,consents:{email:false,phone:true}}),
+  L({name:'Beata Piotrowska',city:'Łódź',email:'beata.p@example.com',source:'meta',budget:12000,timeline:'m6',interior:'dining',status:'lost',lostReason:'Za drogo',d:25,consents:{email:true,phone:false}}),
+  L({name:'Grzegorz Grabowski',city:'Gliwice',email:'g.grab@example.com',source:'meta',budget:16000,timeline:'m3',interior:'house',status:'lost',lostReason:'Kupił gdzie indziej',d:30,consents:{email:false,phone:false}}),
+  L({name:'Ewelina Pawlak',city:'Kraków',email:'e.pawlak@example.com',source:'showroom',budget:23000,timeline:'m3',interior:'house',status:'contact',d:4,consents:{email:true,phone:true}}),
+  L({name:'Sebastian Michalski',city:'Lublin',email:'s.mich@example.com',source:'marketplace',budget:7000,timeline:'later',interior:'dining',config:{...defConfig(),wood:'akacja',len:180,wid:90},d:5,consents:{email:false,phone:false}})
+ ];
+ for(const l of leads){l.history=[{at:l.created,text:'Zapytanie zapisane ('+(SOURCES[l.source]?.n||l.source)+').'}];if(l.status!=='new'){l.replied=true;l.repliedAt=new Date(new Date(l.created).getTime()+40*60000).toISOString();}}
+ s.leads=leads;
+ const T=(lead,title,due,extra={})=>({id:uid(),leadId:lead.id,title,due,done:false,demo:true,...extra});
+ s.tasks=[T(leads[4],'Przypomnienie po wycenie (próbki / wizualizacja)',addDays(-1),{demoOverdue:true}),T(leads[3],'Przypomnienie po wycenie',addDays(0)),T(leads[2],'Odbiór próbek w pracowni Studio Forma',addDays(1)),T(leads[6],'Wizualizacja stołu do sali zarządu',addDays(2)),T(leads[7],'Zdjęcia deski do akceptacji',addDays(0)),T(leads[13],'Telefon po wizycie w salonie',addDays(-2))];
+ s.costs={meta:0,google:0,architect:0};
+ return s;
+}
+
+// ---------- UI: nawigacja ----------
+let page='pulpit',leadFilter={status:'open',source:'',q:''},cfg=defConfig();
+const PAGES=[['pulpit','Pulpit'],['hunt','Szukaj klienta'],['leads','Zapytania'],['quote','Wycena'],['partners','Architekci'],['channels','Kanały'],['scen','Scenariusze'],['settings','Ustawienia']];
+function urgentCount(){return state.leads.filter(l=>l.status==='new'&&score(l).level!=='cold').length+state.tasks.filter(t=>!t.done&&t.due<dayIso()).length;}
+function tabs(){const u=urgentCount();$('#tabs').innerHTML=PAGES.map(([k,n])=>`<button data-go="${k}" class="${page===k?'on':''}">${n}${k==='pulpit'&&u?'<span class="badge">'+u+'</span>':''}</button>`).join('');$('#brand-sub').textContent=state.settings.brand+(state.demo?' · dane demo':'');}
+function go(p){page=p;render();window.scrollTo(0,0);}
+function render(){tabs();({pulpit:pulpit,hunt:huntPage,leads:leadsPage,quote:quotePage,partners:partnersPage,channels:channelsPage,scen:scenPage,settings:settingsPage}[page]||pulpit)();}
+let toastT;function toast(t,bad){clearTimeout(toastT);let el=$('.toast');if(!el){el=document.createElement('div');document.body.appendChild(el);}el.className='toast'+(bad?' bad':'');el.textContent=t;toastT=setTimeout(()=>el.remove(),3800);}
+function storageNote(){return storageOK?'':'<div class="notice bad"><b>Ta przeglądarka nie zapisuje danych</b> (tryb prywatny lub blokada). Pracuj normalnie, ale przed zamknięciem pobierz kopię: Ustawienia → Pobierz kopię JSON.</div>';}
+
+// ---------- Pulpit ----------
+function pulpit(){
+ const L=state.leads,open=L.filter(l=>OPEN.includes(l.status)),hotNew=L.filter(l=>l.status==='new').map(l=>({l,s:score(l)})).sort((a,b)=>b.s.pts-a.s.pts);
+ const late=hotNew.filter(x=>x.s.level==='hot'&&hoursSince(x.l.created)>state.settings.respondHours);
+ const pipe=open.reduce((a,l)=>a+(l.config?quote(l.config).mid:Number(l.budget)||0),0);
+ const m30=L.filter(l=>l.status==='won'&&hoursSince(l.wonAt||l.created)<24*30),won30=m30.reduce((a,l)=>a+(Number(l.wonValue)||0),0);
+ const tasks=state.tasks.filter(t=>!t.done).sort((a,b)=>a.due.localeCompare(b.due)),over=tasks.filter(t=>t.due<dayIso()),today=tasks.filter(t=>t.due===dayIso());
+ const todo=[...hotNew.map(x=>({k:0,html:`${lvlPill(x.s)} <b>${h(x.l.name||'Bez imienia')}</b> · ${h(x.l.city)} · ${h(SOURCES[x.l.source]?.n||'')}<div class="tiny muted">czeka ${Math.max(0,Math.round(hoursSince(x.l.created)))} h · ${h(x.s.sla)}</div>`,btn:`<button class="small primary" data-lead="${x.l.id}">Odpowiedz</button>`})),
+  ...over.map(t=>({k:1,html:`<span class="pill hot">Zaległe ${fmtDate(t.due)}</span> <b>${h(t.title)}</b><div class="tiny muted">${h(leadName(t.leadId))}</div>`,btn:`<button class="small" data-lead="${t.leadId}">Otwórz</button> <button class="small" data-done="${t.id}">Zrobione</button>`})),
+  ...today.map(t=>({k:2,html:`<span class="pill warm">Dziś</span> <b>${h(t.title)}</b><div class="tiny muted">${h(leadName(t.leadId))}</div>`,btn:`<button class="small" data-lead="${t.leadId}">Otwórz</button> <button class="small" data-done="${t.id}">Zrobione</button>`}))];
+ $('#view').innerHTML=`${storageNote()}<div class="row"><div><div class="tiny muted">TABLE HUNTER · ${h(state.settings.brand)}</div><h1>Dziś w sprzedaży stołów</h1></div><span class="sp"></span><button class="primary" data-act="new-lead">+ Nowe zapytanie</button><button data-go="quote">Wycena</button></div>
+ ${state.leads.length?'':`<div class="notice"><b>Pierwsze uruchomienie.</b> Do pokazu wczytaj dane demo i przejdź Scenariusze. <button class="small primary" data-act="demo">Wczytaj dane demo</button> <button class="small" data-go="scen">Scenariusze</button></div>`}
+ <div class="grid g4" style="margin:12px 0">
+  <div class="card kpi ${late.length?'alert':''}"><div class="n">${hotNew.length}</div><div class="l">nowe zapytania bez odpowiedzi${late.length?` · <b style="color:var(--hot)">${late.length} gorące po czasie</b>`:''}</div></div>
+  <div class="card kpi ${over.length?'alert':''}"><div class="n">${over.length+today.length}</div><div class="l">zadania na dziś${over.length?` · <b style="color:var(--hot)">${over.length} zaległe</b>`:''}</div></div>
+  <div class="card kpi"><div class="n">${zl(pipe)}</div><div class="l">wartość otwartych rozmów (${open.length})</div></div>
+  <div class="card kpi"><div class="n">${zl(won30)}</div><div class="l">sprzedaż — ostatnie 30 dni (${m30.length} szt.)</div></div>
+ </div>
+ <div class="grid g2">
+  <div class="card"><h2>Do zrobienia teraz</h2>${todo.length?todo.sort((a,b)=>a.k-b.k).slice(0,12).map(x=>`<div class="todo"><div class="what">${x.html}</div><div>${x.btn}</div></div>`).join(''):'<p class="muted">Wszystko obsłużone. Dobra robota.</p>'}</div>
+  <div class="card"><h2>Lejek</h2>${STATUSES.map(([k,n])=>{const c=L.filter(l=>l.status===k).length,mx=Math.max(1,...STATUSES.map(([kk])=>L.filter(l=>l.status===kk).length));return `<div style="margin:6px 0"><div class="row tiny"><span>${n}</span><span class="sp"></span><b>${c}</b></div><div class="bar"><i style="width:${c/mx*100}%;${k==='lost'?'background:#bbb':k==='won'?'background:var(--ok)':''}"></i></div></div>`;}).join('')}
+  <h3>Skąd przychodzą klienci</h3>${sourceMini()}<p class="tiny"><a href="#" data-go="channels">Kanały: po co i jak szukać klientów →</a></p></div>
+ </div>`;
+}
+function sourceMini(){const by={};for(const l of state.leads){by[l.source]=by[l.source]||{n:0,won:0};by[l.source].n++;if(l.status==='won')by[l.source].won+=Number(l.wonValue)||0;}const rows=Object.entries(by).sort((a,b)=>b[1].won-a[1].won||b[1].n-a[1].n);return rows.length?`<table class="parts">${rows.map(([k,v])=>`<tr><td>${h(SOURCES[k]?.n||k)}</td><td>${v.n} zap.</td><td><b>${zl(v.won)}</b></td></tr>`).join('')}</table>`:'<p class="muted tiny">Pojawi się po zapisaniu zapytań.</p>';}
+function leadName(id){const l=state.leads.find(x=>x.id===id);return l?(l.name||'Bez imienia')+(l.city?' · '+l.city:''):'';}
+
+// ---------- Zapytania ----------
+function leadsPage(){
+ const f=leadFilter;let rows=state.leads.filter(l=>(f.status==='open'?OPEN.includes(l.status):!f.status||l.status===f.status)&&(!f.source||l.source===f.source)&&(!f.q||(l.name+' '+l.city+' '+l.email+' '+l.phone).toLowerCase().includes(f.q.toLowerCase())));
+ rows=rows.map(l=>({l,s:score(l)})).sort((a,b)=>(a.l.status==='new'?0:1)-(b.l.status==='new'?0:1)||b.s.pts-a.s.pts);
+ $('#view').innerHTML=`${storageNote()}<div class="row"><h1>Zapytania klientów</h1><span class="sp"></span><button class="primary" data-act="new-lead">+ Nowe zapytanie</button></div>
+ <p class="lead">Tylko osoby, które same zapytały o stół (formularz, telefon, polecenie, ekspozycja). Kolejność: najpierw nowe i najgorętsze. Kliknij wiersz — zobaczysz wynik, gotową odpowiedź i następny krok.</p>
+ <div class="row noprint" style="margin-bottom:10px"><select id="f-status" style="width:auto"><option value="open">Otwarte</option><option value="">Wszystkie</option>${STATUSES.map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select><select id="f-source" style="width:auto"><option value="">Wszystkie źródła</option>${Object.entries(SOURCES).map(([k,v])=>`<option value="${k}">${h(v.n)}</option>`).join('')}</select><input id="f-q" placeholder="Szukaj: imię, miasto, telefon" style="max-width:260px" value="${h(f.q)}"><span class="sp"></span><button class="small" data-act="csv-import">Import CSV (Meta / LinkedIn)</button><button class="small" data-act="csv">Eksport CSV</button></div>
+ <div class="card scroll">${rows.length?`<table><thead><tr><th>Wynik</th><th>Klient</th><th>Stół / budżet</th><th>Źródło</th><th>Status</th><th>Następny krok</th></tr></thead><tbody>${rows.map(({l,s})=>{const t=openTasks(l)[0];return `<tr class="click" data-lead="${l.id}"><td>${lvlPill(s)}</td><td><b>${h(l.name||'Bez imienia')}</b><div class="tiny muted">${h(l.city)} · ${fmtDate(l.created)}</div></td><td>${s.q?zl(s.q.mid):'—'}<div class="tiny muted">budżet ${l.budget?zl(l.budget):'—'}</div></td><td class="tiny">${h(SOURCES[l.source]?.n||'')}${l.partnerId?'<br>'+h(partnerName(l.partnerId)):''}</td><td>${stPill(l.status)}</td><td class="tiny">${t?`<b>${h(t.title)}</b> · ${fmtDate(t.due)}`:h(nextStep(l))}</td></tr>`;}).join('')}</tbody></table>`:'<p class="muted">Brak zapytań w tym widoku.</p>'}</div>`;
+ $('#f-status').value=f.status;$('#f-source').value=f.source;
+ $('#f-status').onchange=e=>{leadFilter.status=e.target.value;leadsPage();};$('#f-source').onchange=e=>{leadFilter.source=e.target.value;leadsPage();};$('#f-q').oninput=e=>{leadFilter.q=e.target.value;clearTimeout(window._qT);window._qT=setTimeout(()=>{leadsPage();const i=$('#f-q');i.focus();i.setSelectionRange(i.value.length,i.value.length);},250);};
+}
+function partnerName(id){return state.partners.find(p=>p.id===id)?.name||'';}
+
+// ---------- formularz zapytania ----------
+function leadForm(pre={}){
+ const l={source:'meta',timeline:'m3',interior:'house',architect:false,budget:'',consents:{email:false,phone:false},config:null,...pre};
+ const c=l.config||{};
+ modal(`<h2>${pre.id?'Edytuj zapytanie':'Nowe zapytanie'}</h2><form id="lead-form">
+ <div class="grid g2"><label>Imię i nazwisko / firma<input name="name" required value="${h(l.name)}"></label><label>Miasto<input name="city" value="${h(l.city)}"></label>
+ <label>E-mail<input name="email" type="email" value="${h(l.email)}"></label><label>Telefon<input name="phone" value="${h(l.phone)}"></label>
+ <label>Skąd przyszło zapytanie<select name="source">${Object.entries(SOURCES).map(([k,v])=>`<option value="${k}" ${l.source===k?'selected':''}>${h(v.n)}</option>`).join('')}</select></label>
+ <label>Architekt / partner (jeśli polecił)<select name="partnerId"><option value="">—</option>${state.partners.map(p=>`<option value="${p.id}" ${l.partnerId===p.id?'selected':''}>${h(p.name)} · ${h(p.city)}</option>`).join('')}</select></label>
+ <label>Budżet klienta (zł)<input name="budget" type="number" min="0" step="500" value="${h(l.budget)}"></label>
+ <label>Na kiedy<select name="timeline">${Object.entries(TIMELINES).map(([k,v])=>`<option value="${k}" ${l.timeline===k?'selected':''}>${v[0]}</option>`).join('')}</select></label>
+ <label>Do jakiego wnętrza<select name="interior">${Object.entries(INTERIORS).map(([k,v])=>`<option value="${k}" ${l.interior===k?'selected':''}>${v[0]}</option>`).join('')}</select></label>
+ <label class="check" style="margin-top:22px"><input type="checkbox" name="architect" ${l.architect?'checked':''}> Klient pracuje z architektem</label></div>
+ <details ${l.config?'open':''}><summary>Stół (opcjonalnie — wtedy wycena trafi do odpowiedzi)</summary><div class="grid g3" style="margin-top:8px">
+ <label>Drewno<select name="wood"><option value="">— bez stołu —</option>${Object.entries(state.settings.woods).map(([k,v])=>`<option value="${k}" ${c.wood===k?'selected':''}>${h(v.n)}</option>`).join('')}</select></label>
+ <label>Długość (cm)<input name="len" type="number" min="60" max="400" value="${h(c.len||220)}"></label><label>Szerokość (cm)<input name="wid" type="number" min="40" max="140" value="${h(c.wid||95)}"></label>
+ <label>Styl żywicy<select name="style">${Object.entries(state.settings.styles).map(([k,v])=>`<option value="${k}" ${c.style===k?'selected':''}>${h(v.n)}</option>`).join('')}</select></label>
+ <label>Nogi aluminiowe<select name="legs">${Object.entries(state.settings.legs).map(([k,v])=>`<option value="${k}" ${c.legs===k?'selected':''}>${h(v.n)}</option>`).join('')}</select></label>
+ <label>Kolor żywicy<select name="color">${state.settings.colors.map(x=>`<option ${c.color===x?'selected':''}>${h(x)}</option>`).join('')}</select></label></div></details>
+ <h3>Zgody klienta (osobno, nic nie jest zaznaczone domyślnie)</h3>
+ <p class="tiny muted" style="margin:0 0 6px">Na samo zapytanie wolno odpowiedzieć. Zgody są potrzebne na późniejsze oferty i inspiracje (art. 398 Prawa komunikacji elektronicznej).</p>
+ <label class="check"><input type="checkbox" name="c_email" ${l.consents?.email?'checked':''}> Zgoda na e-maile z ofertami i inspiracjami</label>
+ <label class="check"><input type="checkbox" name="c_phone" ${l.consents?.phone?'checked':''}> Zgoda na kontakt telefoniczny w sprawie oferty</label>
+ <label>Notatka<textarea name="notes">${h(l.notes)}</textarea></label>
+ <div class="row"><button class="primary" type="submit">Zapisz zapytanie</button><span class="tiny muted">Wynik i odpowiedź pojawią się od razu.</span></div></form>`);
+ $('#lead-form').onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
+  const data={name:f.name.trim(),city:f.city.trim(),email:f.email.trim(),phone:f.phone.trim(),source:f.source,partnerId:f.partnerId||'',budget:Number(f.budget)||0,timeline:f.timeline,interior:f.interior,architect:!!f.architect||!!f.partnerId,consents:{email:!!f.c_email,phone:!!f.c_phone},notes:f.notes,config:f.wood?{wood:f.wood,len:Number(f.len)||220,wid:Number(f.wid)||95,style:f.style,legs:f.legs,color:f.color,finish:(pre.config&&pre.config.finish)||'oil'}:null};
+  if(!data.name)return toast('Wpisz imię lub nazwę klienta.',true);
+  if(f.source==='architect'&&!f.partnerId&&state.partners.length)toast('Wskazówka: wybierz pracownię, żeby policzyć prowizję.');
+  let l=pre.id?state.leads.find(x=>x.id===pre.id):null;
+  if(l){Object.assign(l,data);hist(l,'Zmieniono dane zapytania.');}
+  else{l={id:uid(),created:nowIso(),status:'new',history:[],...data};hist(l,'Zapytanie zapisane ('+(SOURCES[l.source]?.n||'')+').');state.leads.push(l);}
+  save();closeModal();openLead(l.id);render();};
+}
+function hist(l,text){(l.history=l.history||[]).push({at:nowIso(),text});}
+
+// ---------- karta zapytania ----------
+function openLead(id){
+ const l=state.leads.find(x=>x.id===id);if(!l)return;const s=score(l),r=reply(l),fu=reply(l,'followup'),tasks=state.tasks.filter(t=>t.leadId===l.id).sort((a,b)=>Number(a.done)-Number(b.done)||a.due.localeCompare(b.due));
+ const mail=m=>`mailto:${encodeURIComponent(l.email)}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}`;
+ const cons=l.consents||{};
+ modal(`<div class="row"><div><div class="tiny muted">${h(SOURCES[l.source]?.n||'')}${l.partnerId?' · '+h(partnerName(l.partnerId)):''} · ${fmtDate(l.created)}</div><h2 style="margin:2px 0">${h(l.name||'Bez imienia')} <span class="muted" style="font-weight:400">${h(l.city)}</span></h2></div><span class="sp"></span>${stPill(l.status)}</div>
+ <div class="notice ${l.status==='new'?(s.level==='hot'?'bad':'warn'):''}"><b>Następny krok:</b> ${h(nextStep(l))}</div>
+ <div class="grid g2">
+  <div class="card"><div class="row"><div class="score">${s.pts}</div><div>${lvlPill(s)}<div class="tiny muted">${h(s.sla)}</div></div></div>
+   <table class="parts">${s.parts.map(p=>`<tr><td>${h(p[0])}</td><td><b>+${p[1]}</b></td><td class="muted">${h(p[2])}</td></tr>`).join('')}</table>
+   ${s.q?`<h3>Stół</h3><div>${h(s.q.label)}</div><div class="price" style="font-size:22px">${zl(s.q.lo)} – ${zl(s.q.hi)}</div>`:'<p class="tiny muted">Brak konfiguracji stołu — dodaj ją w „Edytuj” albo w Wycenie.</p>'}
+   <h3>Kontakt</h3><div class="kv"><b>E-mail</b><span>${h(l.email||'—')}</span><b>Telefon</b><span>${l.phone?`<a href="tel:${h(l.phone.replace(/\s/g,''))}">${h(l.phone)}</a>`:'—'}</span><b>Zgody</b><span>${cons.email?'✓ e-maile z ofertami':'✗ e-maile z ofertami'} · ${cons.phone?'✓ telefon':'✗ telefon'}</span></div>
+   ${!cons.email?'<p class="tiny muted">Na to zapytanie możesz odpowiedzieć. Bez zgody nie wysyłaj kolejnych ofert ani newslettera.</p>':''}
+   <div class="row" style="margin-top:10px"><button class="small" data-act="edit-lead" data-id="${l.id}">Edytuj</button></div>
+  </div>
+  <div class="card"><h3 style="margin-top:0">${l.status==='quote'?'Przypomnienie po wycenie':'Odpowiedź do wysłania'}</h3>
+   <pre class="mail" id="mail-text"><b>Temat:</b> ${h((l.status==='quote'?fu:r).subject)}\n\n${h((l.status==='quote'?fu:r).body)}</pre>
+   <div class="row" style="margin-top:8px"><button class="primary small" data-act="copy-reply" data-id="${l.id}" data-kind="${l.status==='quote'?'followup':'first'}">Kopiuj odpowiedź</button>${l.email?`<a class="btn small" data-act="mailto" data-id="${l.id}" data-kind="${l.status==='quote'?'followup':'first'}" href="${h(mail(l.status==='quote'?fu:r))}">Otwórz w poczcie</a>`:''}${l.phone?`<a class="btn small" href="tel:${h(l.phone.replace(/\s/g,''))}">Zadzwoń</a>`:''}</div>
+   ${l.status!=='quote'&&!['won','lost'].includes(l.status)?`<details style="margin-top:8px"><summary class="tiny">Przypomnienie po wycenie (gotowe)</summary><pre class="mail">${h(fu.body)}</pre><button class="small" data-act="copy-reply" data-id="${l.id}" data-kind="followup">Kopiuj przypomnienie</button></details>`:''}
+   ${l.status==='won'?`<details style="margin-top:8px" open><summary class="tiny">Po sprzedaży: prośba o zdjęcia i polecenie</summary><pre class="mail">${h(reply(l,'after').body)}</pre><button class="small" data-act="copy-reply" data-id="${l.id}" data-kind="after">Kopiuj</button></details>`:''}
+   <p class="tiny muted">Aplikacja nie wysyła wiadomości sama — kopiujesz ją do swojej poczty lub komunikatora.</p></div>
+ </div>
+ <div class="grid g2" style="margin-top:12px">
+  <div class="card"><h3 style="margin-top:0">Status</h3><div class="opts">${STATUSES.map(([k,n])=>`<button class="small ${l.status===k?'on':''}" data-status="${k}" data-id="${l.id}">${n}</button>`).join('')}</div>
+   ${l.status==='won'?`<p>Kwota sprzedaży: <b>${zl(l.wonValue)}</b></p>`:''}${l.status==='lost'?`<p>Powód: <b>${h(l.lostReason||'—')}</b></p>`:''}
+   <h3>Zadania</h3>${tasks.length?tasks.map(t=>`<div class="todo"><div class="what ${t.done?'muted':''}">${t.done?'✓ ':''}${h(t.title)} <span class="tiny ${!t.done&&t.due<dayIso()?'':'muted'}" style="${!t.done&&t.due<dayIso()?'color:var(--hot);font-weight:600':''}">${fmtDate(t.due)}</span></div>${t.done?'':`<button class="small" data-done="${t.id}">Zrobione</button>`}</div>`).join(''):'<p class="tiny muted">Brak zadań.</p>'}
+   <form id="task-form" class="row" style="margin-top:8px"><input name="title" placeholder="np. Telefon do klienta" style="flex:2;min-width:160px" required><select name="due" style="width:auto">${[[1,'jutro'],[0,'dziś'],[3,'za 3 dni'],[7,'za tydzień'],[14,'za 2 tygodnie']].map(([d,n])=>`<option value="${addDays(d)}">${n}</option>`).join('')}</select><button class="small" type="submit">+ Zadanie</button></form>
+  </div>
+  <div class="card"><h3 style="margin-top:0">Notatki i historia</h3><textarea id="lead-notes" placeholder="Co ustalono, preferencje, wymiary pomieszczenia…">${h(l.notes)}</textarea><button class="small" data-act="save-notes" data-id="${l.id}" style="margin-top:6px">Zapisz notatkę</button>
+   <ul class="tiny muted" style="padding-left:18px;margin-top:10px">${(l.history||[]).slice().reverse().slice(0,12).map(x=>`<li>${fmtDate(x.at)} — ${h(x.text)}</li>`).join('')}</ul></div>
+ </div>`,l.id);
+ $('#task-form').onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));state.tasks.push({id:uid(),leadId:l.id,title:f.title.trim(),due:f.due,done:false});hist(l,'Zadanie: '+f.title.trim()+' ('+fmtDate(f.due)+').');save();openLead(l.id);render();toast('Zadanie dodane.');};
+}
+function setStatus(id,st){
+ const l=state.leads.find(x=>x.id===id);if(!l||l.status===st)return;
+ if(st==='won'){const v=prompt('Kwota sprzedaży (zł):',l.config?quote(l.config).mid:(l.budget||''));if(v===null)return;l.wonValue=Number(String(v).replace(/[^\d]/g,''))||0;l.wonAt=nowIso();}
+ if(st==='lost'){const v=prompt('Powód utraty — wpisz numer:\n'+LOST.map((x,i)=>(i+1)+'. '+x).join('\n'),'1');if(v===null)return;l.lostReason=LOST[Number(v)-1]||String(v);}
+ const prev=l.status;l.status=st;if(prev==='new'&&!l.replied){l.replied=true;l.repliedAt=nowIso();}
+ if(st==='quote'){l.quoteAt=nowIso();if(!state.tasks.some(t=>t.leadId===l.id&&!t.done&&/Przypomnienie/.test(t.title)))state.tasks.push({id:uid(),leadId:l.id,title:'Przypomnienie po wycenie (próbki / wizualizacja)',due:addDays(3),done:false});}
+ if(['won','lost'].includes(st))for(const t of state.tasks)if(t.leadId===l.id&&!t.done&&st==='lost')t.done=true;
+ hist(l,`Status: ${STATUS[prev]} → ${STATUS[st]}${st==='won'?' ('+zl(l.wonValue)+')':''}${st==='lost'?' — '+l.lostReason:''}.`);save();openLead(id);render();
+ toast(st==='quote'?'Status: Wycena wysłana. Dodano przypomnienie za 3 dni.':'Status: '+STATUS[st]+'.');
+}
+
+// ---------- Wycena ----------
+function quotePage(){
+ const S=state.settings,q=quote(cfg);state.lastQuote={...cfg};save();
+ const opt=(name,obj,val)=>`<div class="opts">${Object.entries(obj).map(([k,v])=>`<button class="small ${val===k?'on':''}" data-cfg="${name}" data-val="${k}">${h(v.n)}</button>`).join('')}</div>`;
+ $('#view').innerHTML=`<h1>Wycena stołu</h1><p class="lead">Konfigurator do rozmowy z klientem (telefon, showroom, targi). Cena jest widełkowa i liczona z cennika w Ustawieniach. Jeden klik zapisuje ją jako zapytanie z gotową odpowiedzią.</p>
+ <div class="grid g2"><div class="card">
+  <label>Drewno</label>${opt('wood',S.woods,cfg.wood)}
+  <div class="grid g2" style="margin-top:10px"><label>Długość: <b id="len-v">${cfg.len}</b> cm<input type="range" id="len" min="120" max="400" step="10" value="${cfg.len}"></label><label>Szerokość: <b id="wid-v">${cfg.wid}</b> cm<input type="range" id="wid" min="60" max="140" step="5" value="${cfg.wid}"></label></div>
+  <label>Styl żywicy</label>${opt('style',S.styles,cfg.style)}
+  <label style="margin-top:10px">Kolor żywicy</label><div class="opts">${S.colors.map(c=>`<button class="small ${cfg.color===c?'on':''}" data-cfg="color" data-val="${h(c)}">${h(c)}</button>`).join('')}</div>
+  <label style="margin-top:10px">Nogi — aluminium z własnej produkcji</label>${opt('legs',S.legs,cfg.legs)}
+  <label style="margin-top:10px">Wykończenie</label>${opt('finish',S.finishes,cfg.finish)}
+ </div><div class="card"><div class="tiny muted">Szacunkowa cena (z dostawą i montażem)</div><div class="price" id="q-price">${zl(q.lo)} – ${zl(q.hi)}</div><div id="q-label">${h(q.label)}</div><div class="tiny muted" style="margin:4px 0 12px">Powierzchnia blatu ${q.area.toFixed(2).replace('.',',')} m² · dla ${Math.max(4,Math.floor(cfg.len/60)*2)} osób</div>
+  <button class="primary" data-act="quote-lead">Zapisz jako zapytanie →</button>
+  <div class="notice tiny" style="margin-top:14px">Argumenty do rozmowy: jeden kawałek drewna wybrany z klientem (zdjęcia desek przed produkcją), wizualizacja we wnętrzu, nogi aluminiowe z własnej produkcji, montaż u klienta. Gdy budżet jest niższy — mniejszy blat albo dąb zamiast orzecha, efekt rzeki zostaje.</div>
+ </div></div>`;
+ for(const k of ['len','wid'])$('#'+k).oninput=e=>{cfg[k]=Number(e.target.value);$('#'+k+'-v').textContent=cfg[k];const q2=quote(cfg);$('#q-price').textContent=zl(q2.lo)+' – '+zl(q2.hi);$('#q-label').textContent=q2.label;state.lastQuote={...cfg};save();};
+}
+
+// ---------- Architekci ----------
+function partnersPage(){
+ const S=state.settings,stat=p=>{const ls=state.leads.filter(l=>l.partnerId===p.id),won=ls.filter(l=>l.status==='won'),rev=won.reduce((a,l)=>a+(Number(l.wonValue)||0),0);return {n:ls.length,won:won.length,rev,com:rev*S.commission/100};};
+ $('#view').innerHTML=`<div class="row"><h1>Architekci i partnerzy</h1><span class="sp"></span><button data-go="hunt">Szukaj automatycznie →</button><button data-act="csv-import">Import CSV</button><button class="primary" data-act="new-partner">+ Dodaj pracownię</button></div>
+ <p class="lead">Kanał B2B2C: architekt decyduje o meblach w drogich wnętrzach. Jedna aktywna pracownia to kilka–kilkanaście stołów rocznie. Pierwszy kontakt osobiście, telefonicznie lub przez LinkedIn — ofertę e-mailem wysyłamy po zgodzie.</p>
+ <div class="grid g4" style="margin-bottom:12px">${PSTAGES.slice(0,4).map(([k,n],i)=>`<div class="card kpi"><div class="n">${state.partners.filter(p=>p.stage===k).length}</div><div class="l">${n}</div></div>`).join('')}</div>
+ <div class="card scroll">${state.partners.length?`<table><thead><tr><th>Pracownia</th><th>Etap</th><th>Polecenia</th><th>Sprzedaż</th><th>Prowizja ${S.commission}%</th><th>Następny krok</th><th></th></tr></thead><tbody>${state.partners.map(p=>{const s=stat(p);return `<tr><td><b>${h(p.name)}</b>${p.via?` <span class="pill st">${{radar:'radar Google',agent:'agent AI',linkedin:'LinkedIn',csv:'CSV'}[p.via]||h(p.via)}</span>`:''}${p.demo&&p.via?' <span class="pill warm">przykład</span>':''}<div class="tiny muted">${h(PTYPES[p.type]||'')}${p.type?' · ':''}${h(p.city)}${p.person?' · '+h(p.person):''}${p.rating?' · ★ '+h(String(p.rating).replace('.',',')):''}</div><div class="tiny">${p.phone?h(p.phone)+' ':''}${p.website?`<a href="${h(p.website)}" target="_blank" rel="noopener noreferrer">www ↗</a> `:''}${p.linkedin?`<a href="${h(p.linkedin)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a> `:''}${p.facebook?`<a href="${h(p.facebook)}" target="_blank" rel="noopener noreferrer">Facebook ↗</a> `:''}${p.maps?`<a href="${h(p.maps)}" target="_blank" rel="noopener noreferrer">Mapy ↗</a>`:''}</div></td><td><select data-pstage="${p.id}" style="width:auto">${PSTAGES.map(([k,n])=>`<option value="${k}" ${p.stage===k?'selected':''}>${n}</option>`).join('')}</select></td><td>${s.n}</td><td>${zl(s.rev)}<div class="tiny muted">${s.won} szt.</div></td><td><b>${zl(s.com)}</b></td><td class="tiny">${h(PNEXT[p.stage])}</td><td><button class="small primary" data-referral="${p.id}">+ Polecenie klienta</button> <button class="small" data-pedit="${p.id}">Edytuj</button></td></tr>`;}).join('')}</tbody></table>`:'<p class="muted">Dodaj pierwsze pracownie z regionu (Homebook, Houzz, Instagram, Stowarzyszenie Architektów Wnętrz).</p>'}</div>
+ <div class="grid g2" style="margin-top:12px"><div class="card"><h3 style="margin-top:0">Program partnerski — co dajemy pracowni</h3><ul><li>Prowizja ${S.commission}% od każdego stołu z polecenia (ustawisz w Ustawieniach)</li><li>Zestaw próbek żywicy i drewna do pracowni</li><li>Wizualizacja stołu w projekcie klienta w 48 h</li><li>Pliki 3D do programów projektowych</li></ul></div>
+ <div class="card"><h3 style="margin-top:0">Jak znaleźć pracownie</h3><ul><li>Homebook i Houzz: profile z realizacjami domów i apartamentów premium</li><li>Instagram: hasztagi #architektwnetrz #projektwnetrz + miasto</li><li>Stowarzyszenie Architektów Wnętrz, Izba Architektów RP</li><li>Targi wnętrzarskie i dni otwarte w pracowni</li></ul></div></div>`;
+}
+function partnerForm(p={}){
+ modal(`<h2>${p.id?'Edytuj pracownię':'Nowa pracownia'}</h2><form id="p-form"><div class="grid g2"><label>Nazwa pracowni<input name="name" required value="${h(p.name)}"></label><label>Miasto<input name="city" value="${h(p.city)}"></label><label>Osoba<input name="person" value="${h(p.person)}"></label><label>Etap<select name="stage">${PSTAGES.map(([k,n])=>`<option value="${k}" ${p.stage===k?'selected':''}>${n}</option>`).join('')}</select></label><label>Typ<select name="type">${Object.entries(PTYPES).map(([k,n])=>`<option value="${k}" ${(p.type||'architect')===k?'selected':''}>${n}</option>`).join('')}</select></label><label>Strona www<input name="website" value="${h(p.website)}" placeholder="https://"></label><label>E-mail<input name="email" value="${h(p.email)}"></label><label>Telefon<input name="phone" value="${h(p.phone)}"></label></div><label>Notatki (styl realizacji, link do portfolio)<textarea name="notes">${h(p.notes)}</textarea></label><button class="primary" type="submit">Zapisz</button></form>`);
+ $('#p-form').onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));if(p.id)Object.assign(state.partners.find(x=>x.id===p.id),f);else state.partners.push({id:uid(),created:nowIso(),...f});save();closeModal();render();toast('Zapisano pracownię.');};
+}
+
+// ---------- Kanały ----------
+function channelsPage(){
+ const S=state.settings,months=Number(S.months)||3,since=Date.now()-months*30*DAY;
+ const stat=k=>{const ls=state.leads.filter(l=>l.source===k&&new Date(l.created).getTime()>=since),won=ls.filter(l=>l.status==='won'),rev=won.reduce((a,l)=>a+(Number(l.wonValue)||0),0),hot=ls.filter(l=>score(l).level==='hot').length,cost=(Number(state.costs[k])||0)*months;return {n:ls.length,hot,won:won.length,rev,cost,cpl:ls.length&&cost?cost/ls.length:null,cps:won.length&&cost?cost/won.length:null,roas:cost?rev/cost:null};};
+ const rec=s=>s.cost&&!s.n?'Koszt bez zapytań — zmień kreację lub frazy albo wstrzymaj.':s.roas!==null&&s.roas>=5?'Zarabia — zwiększ budżet o 20–30%.':s.roas!==null&&s.roas<2&&s.n>=5?'Zapytania są, sprzedaży mało — sprawdź czas odpowiedzi i jakość kierowania.':!s.cost&&s.won?'Sprzedaż bez kosztu mediowego — rozwijaj (polecenia, partnerzy).':s.n?'Za mało danych — obserwuj 2–3 tygodnie.':'Brak zapytań w okresie.';
+ const rows=Object.keys(SOURCES).map(k=>[k,stat(k)]);
+ const tot=rows.reduce((a,[,s])=>({n:a.n+s.n,won:a.won+s.won,rev:a.rev+s.rev,cost:a.cost+s.cost}),{n:0,won:0,rev:0,cost:0});
+ const done=PLAN30.filter(x=>state.playbook[x[0]]).length;
+ $('#view').innerHTML=`<h1>Kanały — gdzie i jak szukać klienta</h1>
+ <p class="lead">Klient na stół za 15–40 tys. zł nie odpowiada na zimne oferty — kupuje, gdy sam szuka albo gdy poleci go ktoś, komu ufa (architekt, znajomy). Dlatego szukamy klienta w miejscach, gdzie <b>sam się zgłasza</b>, i mierzymy każdy kanał: ile zapytań, ile sprzedaży, ile kosztowało.</p>
+ <div class="card"><div class="row"><h2 style="margin:0">Wyniki kanałów</h2><span class="sp"></span><label style="margin:0">Okres <select id="months" style="width:auto">${[1,3,6,12].map(m=>`<option value="${m}" ${months===m?'selected':''}>ostatnie ${m} mies.</option>`).join('')}</select></label></div>
+ <div class="scroll"><table><thead><tr><th>Kanał</th><th>Koszt / mies. (zł)</th><th>Zapytania</th><th>Gorące</th><th>Sprzedaż</th><th>Koszt zapytania</th><th>ROAS</th><th>Rekomendacja</th></tr></thead><tbody>${rows.map(([k,s])=>`<tr><td><b>${h(SOURCES[k].n)}</b></td><td><input type="number" min="0" step="100" data-cost="${k}" value="${state.costs[k]||''}" placeholder="0" style="width:100px"></td><td>${s.n}</td><td>${s.hot}</td><td>${s.won} · ${zl(s.rev)}</td><td>${s.cpl!==null?zl(s.cpl):'—'}</td><td>${s.roas!==null?s.roas.toFixed(1).replace('.',',')+'×':'—'}</td><td class="tiny">${h(rec(s))}</td></tr>`).join('')}
+ <tr><td><b>Razem</b></td><td>${zl(tot.cost/months)}</td><td><b>${tot.n}</b></td><td></td><td><b>${tot.won} · ${zl(tot.rev)}</b></td><td>${tot.n&&tot.cost?zl(tot.cost/tot.n):'—'}</td><td>${tot.cost?(tot.rev/tot.cost).toFixed(1).replace('.',',')+'×':'—'}</td><td></td></tr></tbody></table></div>
+ <p class="tiny muted">ROAS = sprzedaż ÷ koszt kanału w okresie. Koszt zapytania = koszt ÷ liczba zapytań. Liczby pochodzą z zapytań zapisanych w aplikacji — dlatego każde zapytanie wpisujemy z właściwym źródłem.</p></div>
+
+ <div class="card" style="margin-top:12px"><div class="row"><h2 style="margin:0">Plan szukania klienta — pierwsze 30 dni</h2><span class="sp"></span><b>${done}/${PLAN30.length}</b></div><div class="bar" style="margin:8px 0 10px"><i style="width:${done/PLAN30.length*100}%"></i></div>
+ ${PLAN30.map(([k,w,t])=>`<label class="check"><input type="checkbox" data-plan="${k}" ${state.playbook[k]?'checked':''}> <span><span class="tiny muted">${w}</span> · ${h(t)}</span></label>`).join('')}</div>
+
+ <h2 style="margin-top:20px">Kanały: po co i jak to zrobić</h2>
+ <div class="grid g2">${PLAYBOOK.map(c=>{const s=stat(c.id);return `<div class="card chan p${c.p}"><div class="row"><h3>${h(SOURCES[c.id].n)}</h3><span class="sp"></span><span class="pill ${c.p===1?'hot':c.p===2?'warm':'cold'}">priorytet ${c.p}</span></div>
+ <p><b>Po co:</b> ${h(c.why)}</p><b>Jak to zrobić:</b><ol class="steps">${c.how.map(x=>`<li>${h(x)}</li>`).join('')}</ol>
+ <div class="kv tiny"><b>Koszt</b><span>${h(c.cost)}</span><b>Pierwszy efekt</b><span>${h(c.time)}</span><b>Mierzysz w</b><span>${h(c.measure)}</span><b>Teraz</b><span>${s.n} zapytań · ${s.won} sprzedanych · ${zl(s.rev)}</span></div></div>`;}).join('')}</div>
+
+ <div class="card legal" style="margin-top:12px"><h2>Czego nie robimy (i dlaczego)</h2><ul>
+ <li><b>Nie wysyłamy ofert e-mailem, SMS-em ani telefonicznie do osób, które nie wyraziły zgody.</b> Art. 398 Prawa komunikacji elektronicznej zakazuje przesyłania informacji handlowej, w tym marketingu bezpośredniego, bez uprzedniej zgody odbiorcy; karę nakłada Prezes UKE. Zgoda musi być osobna dla każdego kanału.</li>
+ <li><b>Nie kupujemy baz kontaktów i nie zbieramy danych osób prywatnych z internetu</b> — taki „lead” i tak nie kupi stołu za kilkadziesiąt tysięcy od nieznanej firmy, a ryzyko prawne jest wysokie.</li>
+ <li><b>Na zapytanie klienta odpowiadamy zawsze</b> — to on zainicjował kontakt. Kolejne oferty i inspiracje tylko z zaznaczoną zgodą (lista w Ustawieniach → „Lista do newslettera”).</li>
+ <li>Formularze (konfigurator, Instagram, targi) mają dwie osobne, niezaznaczone zgody: e-mail i telefon.</li></ul>
+ <p class="tiny muted">To podsumowanie zasad, nie porada prawna — formularz publiczny i politykę prywatności warto dać do sprawdzenia prawnikowi.</p></div>`;
+ $('#months').onchange=e=>{state.settings.months=Number(e.target.value);save();channelsPage();};
+}
+
+// ---------- Scenariusze ----------
+function scenPage(){
+ const all=SCEN.map(sc=>({sc,st:sc.steps.map(([t,f,g])=>({t,g,auto:f.length>0,ok:f.length>0&&!!f(state)}))}));
+ const chk=x=>x.st.filter(s=>s.auto),n=all.reduce((a,x)=>a+chk(x).filter(s=>s.ok).length,0),tot=all.reduce((a,x)=>a+chk(x).length,0);
+ $('#view').innerHTML=`<div class="row"><h1>Scenariusze do przejścia</h1><span class="sp"></span><button class="primary" data-act="demo">Wczytaj dane demo</button><button data-act="print">Drukuj</button></div>
+ <p class="lead">Siedem praktycznych sytuacji z codziennej sprzedaży stołów, po 2–3 minuty każda. Kroki z ✓ odhaczają się same, gdy wykonasz je w aplikacji. Zacznij od „Wczytaj dane demo” (zastępuje dane w tej przeglądarce).</p>
+ ${state.demo?'':'<div class="notice warn">Teraz pracujesz na własnych danych. Do pokazu wczytaj dane demo — wcześniej pobierz kopię (Ustawienia), jeśli masz już prawdziwe zapytania.</div>'}
+ <div class="row tiny"><span>Postęp pokazu</span><span class="sp"></span><b>${n}/${tot}</b></div><div class="bar" style="margin:4px 0 14px"><i style="width:${tot?n/tot*100:0}%"></i></div>
+ <div class="grid g2">${all.map(({sc,st},i)=>{const c=st.filter(s=>s.auto),d=c.filter(s=>s.ok).length;return `<div class="card" id="scen-${sc.id}"><div class="row"><h3 style="margin:0">${i+1}. ${h(sc.t)}</h3><span class="sp"></span><span class="pill st ${d===c.length?'won':''}">${d}/${c.length}</span></div><p class="tiny muted">${h(sc.why)}</p><ol class="steps">${st.map(s=>`<li class="${s.ok?'done':''}">${h(s.t)} <button class="small" data-go="${s.g}">Przejdź →</button></li>`).join('')}</ol></div>`;}).join('')}</div>`;
+}
+
+// ---------- Szukaj klienta: gotowe wyszukiwania i teksty dla wybranego miasta ----------
+const CITIES=['Warszawa','Kraków','Wrocław','Poznań','Gdańsk','Gdynia','Sopot','Łódź','Katowice','Gliwice','Lublin','Rzeszów','Szczecin','Bydgoszcz','Toruń','Olsztyn','Białystok','Kielce','Opole','Zielona Góra','Konstancin-Jeziorna','Piaseczno'];
+let huntCity=state.huntCity||'Warszawa';
+const G=q=>'https://www.google.com/search?q='+encodeURIComponent(q);
+const M=q=>'https://www.google.com/maps/search/'+encodeURIComponent(q);
+function huntPage(){
+ const c=huntCity,S=state.settings;
+ const L=(href,label,hint)=>`<li><a href="${h(href)}" target="_blank" rel="noopener noreferrer">${h(label)} ↗</a>${hint?` <span class="tiny muted">${h(hint)}</span>`:''}</li>`;
+ const kw=['stół z żywicy na wymiar','stół z żywicy epoksydowej','stół rzeka','stół z żywicą '+c,'stół z orzecha na wymiar','stół dębowy z żywicą','stół do jadalni na wymiar '+c,'stół z litego drewna i żywicy'];
+ const neg=['żywica do stołu','jak zrobić','tanio','używany','DIY','kurs','zestaw żywicy','olx'];
+ const gads=`Nagłówki:\nStół z żywicy na wymiar | ${S.brand}\nJeden kawałek drewna. Twoja rzeka.\nCena od razu w konfiguratorze\nZdjęcia desek przed produkcją\nDostawa i montaż: ${c} i okolice\n\nOpis:\nStoły z litego drewna i żywicy na wymiar. Wybierasz deskę, kolor żywicy i aluminiowe nogi — cenę widzisz od razu. Wizualizacja we wnętrzu przed produkcją.`;
+ const meta=`Tekst główny:\nUrządzasz dom? Stół to serce jadalni — u nas powstaje z jednego kawałka drewna, który wybierasz razem z nami, i żywicy w Twoim kolorze. Zobacz, jak go robimy, i sprawdź cenę w 2 minuty.\n\nNagłówek: Twój stół. Jedyny taki.\nPrzycisk: Dowiedz się więcej → formularz\n\nPytania w formularzu: wymiary stołu · budżet · na kiedy · czy pracuje z Tobą architekt\nZgody (osobno, niezaznaczone): e-mail z ofertami · kontakt telefoniczny`;
+ const target=`Lokalizacja: ${c} + 30 km\nWiek: 30–60\nZainteresowania: architektura wnętrz, projektowanie wnętrz, budowa domu, meble premium, Pinterest/Houzz\nOsobno: osoby, które obejrzały ≥50% filmów marki (retargeting)\nOsobno: podobni do klientów, którzy kupili (lista z CSV, jeśli są zgody)`;
+ $('#view').innerHTML=`<h1>Szukaj klienta</h1><p class="lead">Klient na stół za kilkanaście–kilkadziesiąt tysięcy kupuje, gdy <b>sam szuka</b> albo gdy <b>poleci go architekt lub partner</b>. Wybierz miasto — dostaniesz gotowe wyszukiwania (otwierają się w nowej karcie) i teksty do skopiowania. Znalezioną pracownię dodasz jednym kliknięciem.</p>
+ <div class="card"><div class="row"><label style="margin:0;min-width:220px">Miasto / region<select id="hunt-city">${CITIES.map(x=>`<option ${x===c?'selected':''}>${h(x)}</option>`).join('')}</select></label><label style="margin:0;flex:1;min-width:200px">albo wpisz inne<input id="hunt-other" placeholder="np. Zakopane"></label><button data-act="hunt-set" class="small">Ustaw</button><span class="sp"></span><button class="primary" data-act="new-partner">+ Dodaj znalezioną pracownię</button></div></div>
+ <div class="card auto-card" id="radar-box" style="margin-top:12px"></div>
+ <div class="card auto-card" style="margin-top:12px"><div class="row"><div><h2 style="margin:0">Agent AI — Google + Facebook + LinkedIn</h2><div class="tiny muted">Agent (ChatGPT Work albo Claude z przeglądarką) sam przeszukuje Google, publiczne strony firm na Facebooku i LinkedIn oraz Homebook. Zwraca listę firm, którą wczytujesz jednym kliknięciem.</div></div><span class="sp"></span><button class="primary" data-act="agent-toggle">${agentOpen?'Zwiń':'▶ Uruchom agenta'}</button></div>
+ ${agentOpen?`<ol class="steps" style="margin-top:10px"><li>Skopiuj zadanie i wklej je do ChatGPT Work albo Claude z przeglądarką. <button class="small primary" data-act="agent-copy">Kopiuj zadanie</button></li><li>Agent przeszukuje Google, Facebooka i LinkedIn (ok. 5–15 min) i zwraca plik JSON.</li><li>Wklej wynik poniżej i kliknij „Wczytaj firmy” — trafią do Architektów i partnerów, bez duplikatów.</li></ol>
+ <details><summary class="tiny">Podgląd zadania dla agenta</summary><pre class="mail" style="max-height:220px;overflow:auto">${h(agentTask())}</pre></details>
+ <textarea id="agent-json" placeholder='Wklej tu wynik agenta: {"kind":"table-hunter-companies","companies":[...]}' style="margin-top:8px"></textarea><div class="row" style="margin-top:6px"><button class="primary small" data-act="agent-import">Wczytaj firmy</button><label class="small btn" style="margin:0">albo plik JSON<input type="file" id="agent-file" accept=".json,application/json" class="hide"></label></div>`:''}</div>
+ <div class="grid g2" style="margin-top:12px">
+  <div class="card chan"><h3>1. Architekci wnętrz — ${h(c)} <span class="pill hot">najwięcej sprzedaży</span></h3><p class="tiny">Szukaj pracowni z realizacjami domów i apartamentów premium, drewnem i meblami na zamówienie. Dodaj 10–30 do zakładki Architekci i prowadź je etapami.</p><ul>
+   ${L(G('architekt wnętrz '+c+' realizacje dom premium'),'Google: architekci wnętrz z realizacjami','wejdź w portfolio, oceń styl')}
+   ${L(G('site:homebook.pl architekt wnętrz '+c),'Homebook: pracownie — '+c)}
+   ${L(G('site:houzz.pl projektant wnętrz '+c),'Houzz: projektanci — '+c)}
+   ${L(M('projektowanie wnętrz '+c),'Mapy Google: studia projektowe','telefon do biura = pierwszy kontakt')}
+   ${L('https://www.instagram.com/explore/tags/architektwnetrz/','Instagram: #architektwnetrz','szukaj kont z miastem w opisie')}
+   ${L(G('site:linkedin.com/in architekt wnętrz '+c),'LinkedIn: architekci (wiadomość z zaproszeniem na spotkanie)')}</ul>
+   <p class="tiny muted">Pierwszy kontakt: telefon do biura pracowni lub wiadomość na LinkedIn z propozycją 30 minut i próbek. Ofertę e-mailem — po zgodzie.</p></div>
+  <div class="card chan"><h3>2. Partnerzy do ekspozycji stołu <span class="pill warm">klient widzi i dotyka</span></h3><p class="tiny">Stół w salonie kuchni premium, galerii wnętrz albo apartamencie pokazowym dewelopera, z QR do konfiguratora i prowizją dla partnera.</p><ul>
+   ${L(M('salon kuchni premium '+c),'Mapy: salony kuchni premium')}
+   ${L(M('galeria wnętrz meble design '+c),'Mapy: galerie wnętrz i salony designu')}
+   ${L(G('apartamenty premium '+c+' deweloper inwestycja 2026'),'Google: inwestycje premium deweloperów','apartament pokazowy = ekspozycja')}
+   ${L(M('salon AGD premium '+c),'Mapy: salony AGD premium')}
+   ${L(G('restauracja fine dining '+c),'Google: restauracje premium','stół w lokalu = ekspozycja i polecenia')}</ul></div>
+  <div class="card chan"><h3>3. Klienci, którzy szukają sami — Google <span class="pill hot">najwyższa intencja</span></h3><p class="tiny">Frazy do kampanii w wyszukiwarce (kliknij, żeby skopiować całą listę):</p>
+   <pre class="mail" style="max-height:150px;overflow:auto">${h(kw.join('\n'))}</pre><div class="row" style="margin-top:6px"><button class="small" data-copy="${h(kw.join('\n'))}">Kopiuj frazy</button><button class="small" data-copy="${h(neg.map(x=>'-'+x).join('\n'))}">Kopiuj wykluczenia</button><button class="small" data-copy="${h(gads)}">Kopiuj reklamę</button></div>
+   <ul style="margin-top:8px">${L('https://trends.google.com/trends/explore?geo=PL&q='+encodeURIComponent('stół z żywicy'),'Google Trends: zainteresowanie „stół z żywicy” w regionach')}${L(G('stół z żywicy na wymiar '+c),'Konkurencja w wynikach Google — '+c)}</ul></div>
+  <div class="card chan"><h3>4. Klienci, którzy urządzają dom — Instagram / Facebook <span class="pill hot">efekt „wow”</span></h3><p class="tiny">Kampania z formularzem natywnym. Kierowanie i tekst — gotowe do wklejenia w Menedżerze reklam:</p>
+   <pre class="mail" style="max-height:170px;overflow:auto">${h(meta)}</pre><div class="row" style="margin-top:6px"><button class="small" data-copy="${h(meta)}">Kopiuj tekst reklamy</button><button class="small" data-copy="${h(target)}">Kopiuj kierowanie</button></div>
+   <ul style="margin-top:8px">${L('https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=PL&q='+encodeURIComponent('stół z żywicy'),'Biblioteka reklam Meta: co reklamuje konkurencja')}</ul></div>
+  <div class="card chan p2"><h3>5. Portale, na których klienci pytają sami <span class="pill warm">tanie zapytania</span></h3><ul>
+   ${L(G('site:oferteo.pl meble wolnostojące na wymiar '+c),'Oferteo: zlecenia „meble na wymiar” — '+c,'konto wykonawcy = zapytania od klientów')}
+   ${L('https://www.homebook.pl/','Homebook: profil firmy z realizacjami')}
+   ${L('https://www.houzz.pl/','Houzz: profil firmy z realizacjami')}</ul></div>
+  <div class="card chan p2"><h3>6. Polecenia i klienci, którzy już kupili <span class="pill warm">najtańszy lead</span></h3><p class="tiny">Każdy sprzedany stół → prośba o zdjęcia i polecenie (gotowa treść w karcie zapytania po sprzedaży). Rabat dla poleconego, prezent dla polecającego.</p>
+   <p class="tiny"><b>Sprzedanych stołów w bazie:</b> ${state.leads.filter(l=>l.status==='won').length} — każdy to potencjalne 1–2 polecenia.</p><button class="small" data-act="won-list">Pokaż sprzedane → poproś o polecenie</button></div>
+ </div>
+ <div class="notice" style="margin-top:12px"><b>Każde zapytanie, które przyjdzie z tych działań, wpisz w „+ Nowe zapytanie” z właściwym źródłem.</b> Wtedy zakładka Kanały pokaże, który kanał naprawdę sprzedaje. Ofert e-mailem i telefonicznie nie wysyłamy do osób prywatnych bez ich zgody (art. 398 Prawa komunikacji elektronicznej) — dlatego wszystkie działania prowadzą do tego, żeby klient zgłosił się sam.</div>`;
+ const set=()=>{const o=$('#hunt-other').value.trim();huntCity=o||$('#hunt-city').value;state.huntCity=huntCity;save();huntPage();};
+ $('#hunt-city').onchange=()=>{$('#hunt-other').value='';set();};drawRadar();if($('#agent-file'))$('#agent-file').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importAgent);};$('#hunt-other').onkeydown=e=>{if(e.key==='Enter')set();};window._huntSet=set;
+}
+
+// =========================================================================================
+// 1.1 — AUTOMATYCZNE WYSZUKIWANIE: Radar Google (Maps / Places), Agent AI (Google + Facebook + LinkedIn), import CSV
+// Szukamy FIRM (architekci, sklepy i salony, deweloperzy) — nie osób prywatnych.
+// =========================================================================================
+const PTYPES={architect:'Architekt / projektant wnętrz',store:'Salon meblowy / galeria wnętrz',kitchen:'Salon kuchni / AGD premium',developer:'Deweloper premium',other:'Inny partner'};
+const RADAR_Q={architect:['architekt wnętrz','projektowanie wnętrz','studio architektury wnętrz'],store:['salon meblowy premium','meble designerskie salon','galeria wnętrz'],kitchen:['salon kuchni premium','studio kuchni na wymiar'],developer:['deweloper apartamenty premium']};
+let radar={running:false,log:[],results:[],cats:{architect:true,store:true,kitchen:true,developer:false}},agentOpen=false;
+function normName(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/sp\.? z o\.?o\.?|s\.?c\.?|sp\.? j\.?|\W+/g,' ').trim();}
+function siteKey(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch{return '';}}
+function partnerExists(r){const n=normName(r.name),w=siteKey(r.website);return state.partners.find(p=>(w&&siteKey(p.website)===w)||(normName(p.name)===n&&(!r.city||!p.city||normName(p.city)===normName(r.city))));}
+function addPartnerFrom(r,via){if(partnerExists(r))return false;state.partners.push({id:uid(),created:nowIso(),name:r.name,city:r.city||huntCity,person:r.person||'',email:r.email||'',phone:r.phone||'',website:r.website||'',type:r.type||'other',stage:'found',via,rating:r.rating||'',reviews:r.reviews||'',maps:r.maps||'',linkedin:r.linkedin||'',facebook:r.facebook||'',notes:r.notes||'',demo:!!r.demo});return true;}
+
+// ---------- Radar Google: Maps JavaScript API (Places) — działa w przeglądarce z kluczem API ----------
+let mapsReady=null;
+function loadMaps(key){
+ if(window.google?.maps?.importLibrary)return Promise.resolve();
+ if(mapsReady)return mapsReady;
+ mapsReady=new Promise((ok,bad)=>{window.__thMaps=()=>ok();window.gm_authFailure=()=>{radarLog('✗ Google odrzucił klucz API (sprawdź, czy włączono „Places API (New)” i „Maps JavaScript API”, oraz ograniczenia klucza).',true);bad(Error('klucz'));};
+  const s=document.createElement('script');s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(key)+'&v=weekly&language=pl&region=PL&loading=async&callback=__thMaps';s.async=true;s.onerror=()=>bad(Error('Brak połączenia z Google (internet?)'));document.head.appendChild(s);setTimeout(()=>bad(Error('Google nie odpowiada')),15000);});
+ mapsReady.catch(()=>{mapsReady=null;});return mapsReady;
+}
+function radarLog(t,bad){radar.log.push({t,bad,at:new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});drawRadar();}
+async function runRadar(){
+ if(radar.running)return;const key=(state.settings.googleKey||'').trim(),cats=Object.keys(RADAR_Q).filter(k=>radar.cats[k]);
+ if(!cats.length)return toast('Zaznacz, czego szukać.',true);
+ radar={...radar,running:true,log:[],results:[]};drawRadar();
+ if(!key)return demoRadar(cats);
+ const seen=new Set();
+ try{radarLog('Łączę z Google Maps…');await loadMaps(key);const {Place}=await google.maps.importLibrary('places');radarLog('✓ Połączono. Szukam w: '+huntCity);
+  for(const cat of cats)for(const q of RADAR_Q[cat]){const text=q+' '+huntCity;radarLog('Google Maps → „'+text+'”…');
+   try{const {places}=await Place.searchByText({textQuery:text,fields:['id','displayName','formattedAddress','nationalPhoneNumber','websiteURI','rating','userRatingCount','googleMapsURI','businessStatus'],maxResultCount:20,language:'pl',region:'pl'});
+    let n=0;for(const p of places||[]){if(seen.has(p.id)||p.businessStatus==='CLOSED_PERMANENTLY')continue;seen.add(p.id);n++;
+     radar.results.push({name:p.displayName,city:huntCity,address:p.formattedAddress||'',phone:p.nationalPhoneNumber||'',website:p.websiteURI||'',rating:p.rating||'',reviews:p.userRatingCount||0,maps:p.googleMapsURI||'',type:cat});}
+    radarLog('✓ '+n+' nowych firm ('+(places||[]).length+' wyników)');}
+   catch(e){radarLog('✗ '+text+': '+(e.message||e),true);}
+   await new Promise(r=>setTimeout(r,250));}
+ }catch(e){radarLog('✗ '+(e.message||'Błąd połączenia z Google'),true);}
+ finishRadar();
+}
+function demoRadar(cats){
+ radarLog('Brak klucza Google — POKAZ NA PRZYKŁADOWYCH FIRMACH (fikcyjne nazwy). Prawdziwe wyniki po wpisaniu klucza w Ustawieniach.',true);
+ const names={architect:['Studio Wnętrz Przykład A','Pracownia Projektowa Przykład B','Atelier Przykład C','Architektura Wnętrz Przykład D'],store:['Salon Meblowy Przykład E','Galeria Designu Przykład F'],kitchen:['Studio Kuchni Przykład G','Kuchnie Premium Przykład H'],developer:['Apartamenty Przykład I']};
+ const jobs=cats.flatMap(cat=>RADAR_Q[cat].map(q=>({cat,q})));let i=0,k=0;
+ const tick=()=>{if(i>=jobs.length)return finishRadar();const j=jobs[i++];radarLog('Google Maps → „'+j.q+' '+huntCity+'” (przykład)…');
+  setTimeout(()=>{const pool=names[j.cat].filter(n=>!radar.results.some(r=>r.name===n));const take=pool.slice(0,Math.min(pool.length,1+(k++%2)));
+   for(const n of take)radar.results.push({name:n,city:huntCity,address:'ul. Przykładowa '+(radar.results.length+3)+', '+huntCity,phone:'',website:'',rating:(4.3+Math.random()*.6).toFixed(1),reviews:20+Math.floor(Math.random()*180),maps:'',type:j.cat,demo:true});
+   radarLog('✓ '+take.length+' firm (przykład)');tick();},550);};
+ tick();
+}
+function finishRadar(){radar.running=false;radar.results.sort((a,b)=>(Number(b.rating)||0)*Math.log10(10+(Number(b.reviews)||0))-(Number(a.rating)||0)*Math.log10(10+(Number(a.reviews)||0)));state.radarRuns=(state.radarRuns||0)+1;save();radarLog('Gotowe: '+radar.results.length+' firm. Zaznacz i kliknij „Dodaj zaznaczone do Architektów i partnerów”.');}
+function drawRadar(){
+ const box=$('#radar-box');if(!box)return;const key=!!(state.settings.googleKey||'').trim();
+ box.innerHTML=`<div class="row"><div><h2 style="margin:0">Radar firm — Google Maps <span class="pill ${key?'st won':'warm'}">${key?'połączony z Google':'tryb pokazowy (bez klucza)'}</span></h2><div class="tiny muted">Automatycznie przeszukuje Google Maps w mieście <b>${h(huntCity)}</b> i zbiera firmy z telefonem, stroną i oceną.</div></div><span class="sp"></span>
+ ${Object.entries(RADAR_Q).map(([k])=>`<label class="check" style="margin:0"><input type="checkbox" data-rcat="${k}" ${radar.cats[k]?'checked':''}> ${h(PTYPES[k].split(' /')[0])}</label>`).join('')}
+ <button class="primary" data-act="radar-run" ${radar.running?'disabled':''}>${radar.running?'Szukam…':'▶ Szukaj automatycznie'}</button></div>
+ ${radar.log.length?`<div class="radar-log">${radar.log.slice(-7).map(x=>`<div class="${x.bad?'bad':''}"><span class="muted">${x.at}</span> ${h(x.t)}</div>`).join('')}${radar.running?'<div class="pulse">●</div>':''}</div>`:''}
+ ${radar.results.length?`<div class="row" style="margin:8px 0"><b>${radar.results.length} firm</b><span class="sp"></span><button class="small" data-act="radar-all">Zaznacz wszystkie</button><button class="small primary" data-act="radar-add">Dodaj zaznaczone do Architektów i partnerów</button></div>
+ <div class="scroll" style="max-height:360px;overflow:auto"><table><thead><tr><th></th><th>Firma</th><th>Typ</th><th>Ocena</th><th>Kontakt</th></tr></thead><tbody>${radar.results.map((r,i)=>{const ex=partnerExists(r);return `<tr class="appear" style="animation-delay:${Math.min(i,20)*40}ms"><td>${ex?'<span class="pill st won">w bazie</span>':`<input type="checkbox" data-rpick="${i}" ${r.pick?'checked':''}>`}</td><td><b>${h(r.name)}</b>${r.demo?' <span class="pill warm">przykład</span>':''}<div class="tiny muted">${h(r.address)}</div></td><td class="tiny">${h(PTYPES[r.type])}</td><td>${r.rating?'★ '+h(String(r.rating).replace('.',','))+' <span class="tiny muted">('+h(r.reviews)+')</span>':'—'}</td><td class="tiny">${r.phone?h(r.phone)+'<br>':''}${r.website?`<a href="${h(r.website)}" target="_blank" rel="noopener noreferrer">${h(siteKey(r.website))} ↗</a>`:''}${r.maps?` · <a href="${h(r.maps)}" target="_blank" rel="noopener noreferrer">Mapy ↗</a>`:''}</td></tr>`;}).join('')}</tbody></table></div>`:''}
+ ${key?'':'<p class="tiny muted" style="margin:8px 0 0">Prawdziwe wyszukiwanie: Ustawienia → „Klucz Google Maps” (instrukcja obok pola, ok. 5 minut). Bez klucza radar pokazuje działanie na fikcyjnych firmach oznaczonych „przykład”.</p>'}`;
+}
+
+// ---------- Agent AI: Google + Facebook + LinkedIn (strony publiczne firm) ----------
+function agentTask(){
+ const S=state.settings,known=state.partners.map(p=>p.name+(p.website?' | '+siteKey(p.website):'')).slice(0,300);
+ return `ZADANIE DLA AGENTA AI (ChatGPT Work / Claude z przeglądarką) — TABLE HUNTER ${VERSION}
+Firma: ${S.brand} — stoły z litego drewna i żywicy epoksydowej na wymiar (premium, 15–40 tys. zł), nogi aluminiowe z własnej produkcji.
+CEL: znajdź FIRMY w mieście/regionie: ${huntCity} (+30 km), które mogą polecać lub sprzedawać nasze stoły klientom indywidualnym:
+ 1) pracownie architektury i projektowania wnętrz (realizacje domów i apartamentów premium),
+ 2) salony meblowe premium i galerie wnętrz / designu,
+ 3) salony kuchni premium i AGD premium,
+ 4) deweloperzy inwestycji premium (apartamenty pokazowe).
+GDZIE SZUKAĆ (tylko strony publiczne, bez logowania):
+ • Google i Google Maps (wizytówki: telefon, strona, ocena),
+ • Facebook — PUBLICZNE strony firm (fanpage: zakładka Informacje),
+ • LinkedIn — PUBLICZNE strony firm (linkedin.com/company/...), najlepiej przez Google: site:linkedin.com/company „architektura wnętrz” ${huntCity},
+ • Homebook / Houzz (profile pracowni), strony firm (kontakt, realizacje).
+ZASADY: tylko firmy, nie osoby prywatne. Nie loguj się, nie wysyłaj wiadomości, nie zapraszaj do kontaktów. Dane kontaktowe tylko firmowe (biuro@, telefon firmy) — dokładnie tak, jak są na stronie źródłowej, bez zgadywania. Każda firma musi mieć URL źródła. Pomiń firmy z listy znanych.
+ILOŚĆ: 25–40 najlepiej dopasowanych firm; najpierw pracownie z realizacjami premium i drewnem / meblami na zamówienie.
+ZNANE FIRMY (pomiń): ${known.join('; ')||'brak'}
+WYNIK: wyłącznie poprawny JSON (bez komentarzy), plik table_hunter_firmy.json:
+{"kind":"table-hunter-companies","city":"${huntCity}","companies":[{"name":"Nazwa firmy","type":"architect | store | kitchen | developer | other","city":"Miasto","address":"Ulica nr, kod miasto","phone":"telefon firmy","email":"e-mail firmowy","website":"https://...","facebook":"https://www.facebook.com/...","linkedin":"https://www.linkedin.com/company/...","maps":"https://maps.google.com/...","rating":4.8,"reviews":56,"why":"dlaczego pasuje (styl realizacji, premium, drewno)","source":"URL, z którego pochodzą dane"}]}`;
+}
+function importAgent(text){
+ let x;try{x=JSON.parse(String(text).trim().replace(/^```(?:json)?\s*|\s*```$/g,''));}catch{return toast('To nie jest poprawny JSON z wynikiem agenta.',true);}
+ const list=Array.isArray(x)?x:x.companies||x.firms||x.firmy||[];if(!Array.isArray(list)||!list.length)return toast('Brak listy firm w wyniku (pole „companies”).',true);
+ let added=0,dup=0;for(const c of list){if(!c||!c.name)continue;const r={name:String(c.name).slice(0,200),city:String(c.city||x.city||huntCity).slice(0,100),phone:String(c.phone||'').slice(0,60),email:String(c.email||'').slice(0,200),website:/^https?:\/\//.test(c.website||'')?c.website:'',type:PTYPES[c.type]?c.type:'other',rating:c.rating||'',reviews:c.reviews||'',maps:/^https?:\/\//.test(c.maps||'')?c.maps:'',linkedin:/^https?:\/\//.test(c.linkedin||'')?c.linkedin:'',facebook:/^https?:\/\//.test(c.facebook||'')?c.facebook:'',notes:[c.why,c.source&&('Źródło: '+c.source),c.address].filter(Boolean).join(' · ').slice(0,1000)};
+  if(addPartnerFrom(r,'agent'))added++;else dup++;}
+ state.agentImports=(state.agentImports||0)+added;save();render();toast(`Agent: dodano ${added} firm do Architektów i partnerów${dup?', pominięto '+dup+' już znanych':''}.`);
+}
+
+// ---------- Import CSV: Meta Lead Ads / LinkedIn Lead Gen Forms / dowolny arkusz ----------
+function decodeFile(buf){const b=new Uint8Array(buf);if(b[0]===0xFF&&b[1]===0xFE)return new TextDecoder('utf-16le').decode(buf);if(b[0]===0xFE&&b[1]===0xFF)return new TextDecoder('utf-16be').decode(buf);return new TextDecoder('utf-8').decode(buf).replace(/^﻿/,'');}
+function parseCSV(t){const first=t.split(/\r?\n/)[0]||'';const d=['\t',';',','].sort((a,b)=>first.split(b).length-first.split(a).length)[0];const rows=[];let row=[],cell='',q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){cell+='"';i++;}else q=false;}else cell+=c;}else if(c==='"')q=true;else if(c===d){row.push(cell);cell='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell='';}else cell+=c;}
+ row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows;}
+function pickCol(hdr,res){const i=hdr.findIndex(x=>res.some(r=>r.test(x)));return i;}
+function importCSV(text,target,source){
+ const rows=parseCSV(text);if(rows.length<2)return toast('Plik nie zawiera wierszy z danymi.',true);
+ const hdr=rows[0].map(x=>x.trim().toLowerCase());const col=res=>pickCol(hdr,res);
+ const iFull=col([/^full.?name$/,/imi[eę] i nazwisko/,/^name$/,/^nazwa$/]),iFirst=col([/first.?name/,/^imi[eę]$/]),iLast=col([/last.?name/,/^nazwisko$/]),iMail=col([/e-?mail/]),iPhone=col([/phone/,/telefon/]),iCity=col([/city/,/miasto/,/miejscowo/]),iComp=col([/company/,/firma/,/organi/]),iTitle=col([/job.?title/,/stanowisko/,/title/]),iBudget=col([/bud[zż]et/,/budget/]),iCons=col([/zgod/,/consent/,/marketing/]),iWeb=col([/website/,/strona/,/www/]);
+ const g=(r,i)=>i>=0?String(r[i]||'').trim():'';let added=0,skip=0;
+ for(const r of rows.slice(1)){const name=g(r,iFull)||[g(r,iFirst),g(r,iLast)].filter(Boolean).join(' ');const email=g(r,iMail),phone=g(r,iPhone);
+  if(target==='partners'){const comp=g(r,iComp)||name;if(!comp){skip++;continue;}if(addPartnerFrom({name:comp,city:g(r,iCity),person:iComp>=0?name:'',email,phone,website:g(r,iWeb),type:'architect',notes:[g(r,iTitle),'Import CSV ('+(source==='linkedin'?'LinkedIn Lead Gen':'CSV')+')'].filter(Boolean).join(' · ')},source))added++;else skip++;continue;}
+  if(!name&&!email&&!phone){skip++;continue;}if(email&&state.leads.some(l=>l.email&&l.email.toLowerCase()===email.toLowerCase())){skip++;continue;}
+  const cons=/^(tak|yes|true|1|zgadzam)/i.test(g(r,iCons));
+  const l={id:uid(),created:nowIso(),status:'new',name:name||email,city:g(r,iCity),email,phone,source,partnerId:'',budget:Number(g(r,iBudget).replace(/[^\d]/g,''))||0,timeline:'m3',interior:'house',architect:false,consents:{email:cons,phone:false},notes:'Import CSV'+(g(r,iComp)?' · firma: '+g(r,iComp):'')+(g(r,iTitle)?' · '+g(r,iTitle):''),config:null,history:[]};
+  hist(l,'Zaimportowano z pliku CSV ('+(SOURCES[source]?.n||source)+').');state.leads.push(l);added++;}
+ save();render();toast(`Import CSV: dodano ${added}${target==='partners'?' firm':' zapytań'}${skip?', pominięto '+skip+' (puste lub już w bazie)':''}.`);
+}
+function csvImportForm(){
+ modal(`<h2>Import CSV — formularze reklamowe</h2><p class="tiny muted">Meta (Instagram/Facebook): Menedżer reklam / Meta Business Suite → Formularze błyskawiczne → Pobierz (CSV). LinkedIn: Campaign Manager → Assets → Lead generation forms → Download leads (CSV). Kolumny rozpoznają się same (imię, e-mail, telefon, miasto, firma, stanowisko, zgody).</p>
+ <form id="csv-form"><div class="grid g2"><label>Dokąd<select name="target"><option value="leads">Zapytania klientów (B2C)</option><option value="partners">Architekci i partnerzy (firmy)</option></select></label>
+ <label>Źródło<select name="source"><option value="meta">Instagram / Facebook (formularz)</option><option value="linkedin">LinkedIn Lead Gen Form</option>${Object.entries(SOURCES).filter(([k])=>k!=='meta').map(([k,v])=>`<option value="${k}">${h(v.n)}</option>`).join('')}</select></label></div>
+ <label>Plik CSV<input type="file" name="file" accept=".csv,text/csv,.txt" required></label><p class="tiny muted">Zgoda marketingowa jest zaznaczana tylko wtedy, gdy plik ma kolumnę zgody z odpowiedzią „tak”.</p><button class="primary" type="submit">Importuj</button></form>`);
+ $('#csv-form').onsubmit=async e=>{e.preventDefault();const f=e.target,file=f.file.files[0];if(!file)return;const text=decodeFile(await file.arrayBuffer());let src=f.source.value;if(src==='linkedin'&&f.target.value==='leads')src='inbound';importCSV(text,f.target.value,f.target.value==='partners'?(f.source.value==='linkedin'?'linkedin':'csv'):src);closeModal();};
+}
+
+// ---------- Ustawienia ----------
+function settingsPage(){
+ const S=state.settings;
+ $('#view').innerHTML=`<h1>Ustawienia</h1>${storageNote()}<div class="grid g2"><div class="card"><h2>Firma i podpis</h2><form id="s-form"><label>Marka<input name="brand" value="${h(S.brand)}"></label><label>Handlowiec (podpis)<input name="seller" value="${h(S.seller)}"></label><div class="grid g2"><label>Telefon<input name="phone" value="${h(S.phone)}"></label><label>E-mail<input name="email" value="${h(S.email)}"></label><label>Czas odpowiedzi na gorące (h)<input name="respondHours" type="number" min="1" max="48" value="${S.respondHours}"></label><label>Prowizja architekta (%)<input name="commission" type="number" min="0" max="40" value="${S.commission}"></label></div>
+ <h3>Cennik (do potwierdzenia przez firmę)</h3><div class="grid g2">${Object.entries(S.woods).map(([k,v])=>`<label>${h(v.n)} — zł/m² blatu<input name="w_${k}" type="number" min="0" step="100" value="${v.m2}"></label>`).join('')}${Object.entries(S.legs).map(([k,v])=>`<label>Nogi ${h(v.n)} — zł<input name="l_${k}" type="number" min="0" step="50" value="${v.p}"></label>`).join('')}${Object.entries(S.styles).map(([k,v])=>`<label>${h(v.n)} — mnożnik<input name="s_${k}" type="number" min="0.5" max="3" step="0.05" value="${v.k}"></label>`).join('')}<label>Dostawa i montaż — zł<input name="delivery" type="number" min="0" step="50" value="${S.delivery}"></label></div>
+ <h3>Radar firm — klucz Google Maps</h3><label>Klucz API Google Maps (Places)<input name="googleKey" value="${h(S.googleKey||'')}" placeholder="AIza…" autocomplete="off"></label>
+ <details class="tiny"><summary>Jak zdobyć klucz (ok. 5 minut)</summary><ol><li>console.cloud.google.com → nowy projekt (np. „Table Hunter”) → podepnij konto rozliczeniowe (Google daje miesięczny limit darmowych zapytań, sprawdź aktualny cennik).</li><li>Interfejsy API: włącz <b>Maps JavaScript API</b> i <b>Places API (New)</b>.</li><li>Dane logowania → Utwórz dane logowania → Klucz API. Ogranicz klucz do tych dwóch API.</li><li>Wklej klucz tutaj i zapisz. W „Szukaj klienta” radar szuka już naprawdę.</li></ol>Klucz zostaje tylko w tej przeglądarce i w kopiach JSON — nie udostępniaj kopii osobom spoza firmy.</details>
+ <button class="primary" type="submit">Zapisz ustawienia</button></form></div>
+ <div class="card"><h2>Dane i kopie</h2><p class="tiny muted">Dane są tylko w tej przeglądarce na tym komputerze. Kopia JSON przenosi je na inny komputer lub telefon.</p>
+ <div class="row"><button data-act="backup">Pobierz kopię JSON</button><button data-act="restore">Wczytaj kopię JSON</button><input type="file" id="restore-file" accept=".json,application/json" class="hide"></div>
+ <div class="row" style="margin-top:8px"><button data-act="csv-import">Import CSV (Meta / LinkedIn)</button><button data-act="csv">Eksport zapytań CSV (Excel)</button><button data-act="newsletter">Lista do newslettera (tylko zgody)</button></div>
+ <h3>Pokaz</h3><div class="row"><button data-act="demo">Wczytaj dane demo</button><button class="danger" data-act="wipe">Wyczyść wszystkie dane</button></div>
+ <p class="tiny muted" style="margin-top:14px">Table Hunter ${VERSION} · jeden plik HTML, działa bez internetu. Zapytania: ${state.leads.length} · pracownie: ${state.partners.length} · zadania: ${state.tasks.length}.</p></div></div>`;
+ $('#s-form').onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));for(const k of ['brand','seller','phone','email','googleKey'])S[k]=(f[k]||'').trim();mapsReady=null;S.respondHours=Math.max(1,Number(f.respondHours)||1);S.commission=Math.max(0,Number(f.commission)||0);S.delivery=Math.max(0,Number(f.delivery)||0);for(const k in S.woods)S.woods[k].m2=Number(f['w_'+k])||S.woods[k].m2;for(const k in S.legs)S.legs[k].p=Number(f['l_'+k])||S.legs[k].p;for(const k in S.styles)S.styles[k].k=Number(f['s_'+k])||S.styles[k].k;save();render();toast('Zapisano ustawienia.');};
+ $('#restore-file').onchange=e=>{const file=e.target.files[0];if(!file)return;file.text().then(t=>{try{const x=JSON.parse(t);if(!x||x.kind!=='table-hunter-backup'||!x.state)throw Error();if(!confirm('Zastąpić bieżące dane kopią z '+fmtDate(x.at)+'?'))return;state=normalize(x.state);save();render();toast('Wczytano kopię.');}catch{toast('To nie jest kopia Table Hunter.',true);}});};
+}
+
+// ---------- pliki ----------
+function download(name,text,type='application/json'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+const csvCell=v=>{let s=String(v??'');if(/^[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};
+function csv(rows){return '﻿'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n');}
+
+function copyText(text,msg='Skopiowano. Wklej tam, gdzie potrzebujesz.'){const fb=()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(msg);}catch{toast('Zaznacz tekst i skopiuj ręcznie.',true);}ta.remove();};try{navigator.clipboard.writeText(text).then(()=>toast(msg),fb);}catch{fb();}}
+// ---------- modal ----------
+let modalLead=null;
+function modal(html,leadId=null){modalLead=leadId;$('#modal-root').innerHTML=`<div class="modal-bg" data-bg="1"><div class="modal"><button class="x small" data-act="close">✕</button>${html}</div></div>`;}
+function closeModal(){modalLead=null;$('#modal-root').innerHTML='';}
+
+// ---------- zdarzenia ----------
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-go],[data-act],[data-lead],[data-done],[data-status],[data-cfg],[data-referral],[data-pedit],[data-copy],.modal-bg');if(!b)return;
+ if(b.classList.contains('modal-bg')){if(e.target===b)closeModal();return;}
+ const d=b.dataset;
+ if(d.go){e.preventDefault();closeModal();return go(d.go);}
+ if(d.lead){return openLead(d.lead);}
+ if(d.done){const t=state.tasks.find(x=>x.id===d.done);if(t){t.done=true;t.doneAt=nowIso();const l=state.leads.find(x=>x.id===t.leadId);if(l)hist(l,'Zrobione: '+t.title+'.');save();if(modalLead)openLead(modalLead);render();toast('Zadanie zrobione. Pamiętaj o kolejnym kroku.');}return;}
+ if(d.status)return setStatus(d.id,d.status);
+ if(d.cfg){cfg[d.cfg]=d.val;return quotePage();}
+ if(d.referral){return leadForm({source:'architect',partnerId:d.referral,architect:true});}
+ if(d.pedit){return partnerForm(state.partners.find(p=>p.id===d.pedit));}
+ if(d.copy!==undefined){copyText(d.copy);state.huntCopied=(state.huntCopied||0)+1;save();return;}
+ const A=d.act;
+ if(A==='close')return closeModal();
+ if(A==='radar-run')return runRadar();
+ if(A==='radar-all'){radar.results.forEach(r=>{if(!partnerExists(r))r.pick=true;});return drawRadar();}
+ if(A==='radar-add'){let n=0;for(const r of radar.results)if(r.pick&&addPartnerFrom(r,'radar'))n++;save();drawRadar();tabs();return toast(n?`Dodano ${n} firm do Architektów i partnerów (etap „Zidentyfikowana”).`:'Zaznacz firmy do dodania.',!n);}
+ if(A==='agent-toggle'){agentOpen=!agentOpen;return huntPage();}
+ if(A==='agent-copy'){state.agentCopied=true;save();return copyText(agentTask(),'Zadanie skopiowane — wklej je agentowi AI.');}
+ if(A==='agent-import')return importAgent($('#agent-json').value);
+ if(A==='csv-import')return csvImportForm();
+ if(A==='hunt-set')return window._huntSet&&window._huntSet();
+ if(A==='won-list'){leadFilter={status:'won',source:'',q:''};return go('leads');}
+ if(A==='new-lead')return leadForm();
+ if(A==='edit-lead')return leadForm(state.leads.find(x=>x.id===d.id));
+ if(A==='new-partner')return partnerForm({stage:'found'});
+ if(A==='quote-lead')return leadForm({source:'www',config:{...cfg}});
+ if(A==='copy-reply'||A==='mailto'){const l=state.leads.find(x=>x.id===d.id);const m=reply(l,d.kind==='followup'?'followup':d.kind==='after'?'after':'first');
+  if(d.kind==='followup')l.followupCopied=true;else if(d.kind!=='after')l.replied=true;if(!l.repliedAt&&d.kind!=='after')l.repliedAt=nowIso();hist(l,(A==='mailto'?'Otwarto w poczcie: ':'Skopiowano: ')+(d.kind==='followup'?'przypomnienie':d.kind==='after'?'prośba o polecenie':'odpowiedź')+'.');save();
+  if(A==='copy-reply'){copyText('Temat: '+m.subject+'\n\n'+m.body,'Skopiowano. Wklej do poczty lub komunikatora.');openLead(l.id);}
+  render();return;}
+ if(A==='save-notes'){const l=state.leads.find(x=>x.id===d.id);l.notes=$('#lead-notes').value;hist(l,'Notatka zaktualizowana.');save();toast('Zapisano notatkę.');return openLead(l.id);}
+ if(A==='demo'){if(state.leads.length&&!state.demo&&!confirm('Wczytać dane demo? Twoje obecne dane w tej przeglądarce zostaną zastąpione (pobierz najpierw kopię w Ustawieniach).'))return;state=demoState();save();page='pulpit';render();toast('Wczytano dane demo — przejdź Scenariusze.');return;}
+ if(A==='wipe'){if(!confirm('Usunąć wszystkie dane z tej przeglądarki? Tej operacji nie można cofnąć.'))return;state=emptyState();save();render();toast('Dane usunięte.');return;}
+ if(A==='backup'){download('TableHunter_kopia_'+dayIso()+'.json',JSON.stringify({kind:'table-hunter-backup',version:VERSION,at:nowIso(),state},null,1));return toast('Pobrano kopię.');}
+ if(A==='restore')return $('#restore-file').click();
+ if(A==='csv'){download('TableHunter_zapytania_'+dayIso()+'.csv',csv([['Data','Klient','Miasto','E-mail','Telefon','Źródło','Architekt','Budżet','Stół','Cena od','Cena do','Wynik','Status','Kwota sprzedaży','Zgoda e-mail','Zgoda telefon'],...state.leads.map(l=>{const s=score(l);return [l.created.slice(0,10),l.name,l.city,l.email,l.phone,SOURCES[l.source]?.n,partnerName(l.partnerId),l.budget,s.q?.label||'',s.q?.lo||'',s.q?.hi||'',s.pts,STATUS[l.status],l.wonValue||'',l.consents?.email?'tak':'nie',l.consents?.phone?'tak':'nie'];})]),'text/csv;charset=utf-8');return toast('Pobrano CSV.');}
+ if(A==='newsletter'){const ok=state.leads.filter(l=>l.consents?.email&&l.email),no=state.leads.filter(l=>l.email&&!l.consents?.email).length;download('TableHunter_newsletter_zgody_'+dayIso()+'.csv',csv([['E-mail','Imię','Miasto','Data zgody (zapytanie)'],...ok.map(l=>[l.email,l.name,l.city,l.created.slice(0,10)])]),'text/csv;charset=utf-8');state.newsletterExported=true;save();render();return toast(`Lista: ${ok.length} osób ze zgodą. Pominięto ${no} bez zgody.`);}
+ if(A==='print')return window.print();
+});
+document.addEventListener('change',e=>{
+ const t=e.target;
+ if(t.dataset.rcat){radar.cats[t.dataset.rcat]=t.checked;return;}
+ if(t.dataset.rpick!==undefined){radar.results[Number(t.dataset.rpick)].pick=t.checked;return;}
+ if(t.dataset.cost!==undefined){state.costs[t.dataset.cost]=Math.max(0,Number(t.value)||0);save();channelsPage();return;}
+ if(t.dataset.plan){state.playbook[t.dataset.plan]=t.checked;save();channelsPage();return;}
+ if(t.dataset.pstage){const p=state.partners.find(x=>x.id===t.dataset.pstage);p.stage=t.value;save();partnersPage();toast('Etap: '+PSTAGE[t.value]+'.');return;}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal-root').innerHTML)closeModal();});
+window.addEventListener('storage',e=>{if(e.key===KEY){state=load();render();}});
+render();
+</script>
+</body>
+</html>
